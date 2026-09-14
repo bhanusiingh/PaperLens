@@ -1,0 +1,45 @@
+﻿# configs/config.yaml
+# PaperLens pipeline configuration.
+# All values here are read by LEDSummarizer, the evaluation script,
+# and the Streamlit app.  Adjust to suit your hardware.
+
+# ---------------------------------------------------------------------------
+# Summarization model
+# ---------------------------------------------------------------------------
+model_name: "allenai/led-large-16384-arxiv"
+
+# Maximum tokens passed to LED in a single forward pass.
+# LED-large-16384 supports up to 16 384 tokens natively.
+# Lower this if you run out of GPU/CPU memory (e.g., 8192 or 4096).
+# The summarizer chunks text that exceeds this limit and runs a final
+# consolidation pass — no silent truncation occurs.
+led_max_input_tokens: 16384
+
+# Chunk overlap (tokens) when hierarchical chunking is required.
+# Preserves context across chunk boundaries.
+chunk_overlap_tokens: 128
+
+# Generated summary token bounds
+min_summary_tokens: 64
+max_summary_tokens: 512
+
+# ---------------------------------------------------------------------------
+# Dataset (used by experiments/evaluate.py)
+# ---------------------------------------------------------------------------
+dataset_name: "ccdv/arxiv-summarization"
+dataset_config: "document"         # use the 'document' configuration
+dataset_input_field: "article"     # full paper text
+dataset_target_field: "abstract"   # reference summary (author-written abstract)
+
+# ---------------------------------------------------------------------------
+# Evaluation
+# ---------------------------------------------------------------------------
+evaluation_metrics:
+  - "rouge1"
+  - "rouge2"
+  - "rougeL"
+
+# ---------------------------------------------------------------------------
+# Application limits
+# ---------------------------------------------------------------------------
+max_papers: 5

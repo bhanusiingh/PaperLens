@@ -1,0 +1,81 @@
+﻿# ============================================================
+# PaperLens — .gitignore
+# ============================================================
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Environment variables / secrets
+.env
+.env.*
+*.secret
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Large datasets — do NOT commit
+data/raw/*.json
+data/raw/*.jsonl
+data/raw/*.csv
+data/raw/*.parquet
+data/raw/*.arrow
+data/raw/*.txt
+data/processed/*
+!data/processed/.gitkeep
+data/samples/*.pdf
+!data/samples/.gitkeep
+
+# Hugging Face model cache
+# The model weights are downloaded at runtime; do not commit them.
+models/
+*.bin
+*.safetensors
+*.h5
+*.pt
+*.ckpt
+
+# Results and generated outputs
+results/*.json
+results/*.csv
+results/*.txt
+results/*.png
+results/*.pdf
+
+# Streamlit
+.streamlit/
+
+# OS-generated
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs and temporary files
+*.log
+*.tmp
+tmp/
+temp/

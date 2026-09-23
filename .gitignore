@@ -1,73 +1,97 @@
-﻿# ============================================================
+# ============================================================
 # PaperLens — .gitignore
 # ============================================================
 
-# Python
+# Python caches and bytecode
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
-*.egg
-*.egg-info/
-dist/
+*.class
+*.so
+.Python
 build/
+develop-eggs/
+dist/
+downloads/
+eggs/
 .eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Testing and linting caches
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
 
 # Virtual environments
 .venv/
 venv/
 env/
 ENV/
+env.bak/
+venv.bak/
 
 # Environment variables / secrets
 .env
 .env.*
 *.secret
 
-# Jupyter
+# Jupyter Notebooks
 .ipynb_checkpoints/
 *.ipynb
 
-# Large datasets — do NOT commit
-data/raw/*.json
-data/raw/*.jsonl
-data/raw/*.csv
-data/raw/*.parquet
-data/raw/*.arrow
-data/raw/*.txt
+# Local PDFs and data files (do NOT commit research papers or session data)
+*.pdf
+data/raw/*
+!data/raw/.gitkeep
 data/processed/*
 !data/processed/.gitkeep
-data/samples/*.pdf
+data/samples/*
 !data/samples/.gitkeep
+data/sessions/*
+!data/sessions/.gitkeep
 
-# Hugging Face model cache
-# The model weights are downloaded at runtime; do not commit them.
+# Hugging Face model cache and weights
 models/
+checkpoints/
+.cache/
 *.bin
 *.safetensors
 *.h5
 *.pt
+*.pth
 *.ckpt
+*.onnx
 
 # Results and generated outputs
-results/*.json
-results/*.csv
-results/*.txt
-results/*.png
-results/*.pdf
+results/*
+!results/.gitkeep
+!results/README.md
 
-# Streamlit
+# Streamlit cache (legacy)
 .streamlit/
 
-# OS-generated
+# OS-generated files
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# IDE / editor
+# IDE and editor files
 .vscode/
 .idea/
 *.swp

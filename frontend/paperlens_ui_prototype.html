@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaperLens — Research Intelligence Workspace</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            850: '#10172a',
+                            900: '#0f172a',
+                            950: '#020617',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+        .transition-all-custom {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="h-full bg-slate-50 text-slate-900 dark:bg-navy-950 dark:text-slate-100 font-sans antialiased overflow-hidden select-none">
+
+    <div id="app" class="flex h-full w-full overflow-hidden">
+        
+        <!-- Toast Notification Container -->
+        <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
+        <!-- Left Sidebar -->
+        <aside class="w-72 bg-white dark:bg-navy-900 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between shrink-0 z-20 transition-all duration-300">
+            <div>
+                <!-- Brand / Logo -->
+                <div class="h-16 px-6 flex items-center justify-between border-b border-slate-100 dark:border-slate-800/60">
+                    <div class="flex items-center gap-3 cursor-pointer" onclick="switchScreen('dashboard')">
+                        <div class="h-9 w-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+                            <i data-lucide="layers" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h1 class="font-bold text-base tracking-tight leading-none bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">PaperLens</h1>
+                            <span class="text-[11px] font-medium text-blue-600 dark:text-blue-400 tracking-wide uppercase">Research Intelligence</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="p-4 space-y-1.5" id="sidebar-nav">
+                    <!-- Navigation rendered dynamically or via static items with active states -->
+                    <button onclick="switchScreen('dashboard')" data-nav="dashboard" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all-custom text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-200">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                        <span>Dashboard</span>
+                    </button>
+                    <button onclick="switchScreen('mypapers')" data-nav="mypapers" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all-custom text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-200">
+                        <i data-lucide="book-open" class="w-4 h-4"></i>
+                        <span>My Papers</span>
+                        <span class="ml-auto bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] px-2 py-0.5 rounded-full font-semibold">12</span>
+                    </button>
+                    <button onclick="switchScreen('upload')" data-nav="upload" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all-custom text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-200">
+                        <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+                        <span>Analyze Papers</span>
+                    </button>
+                    <button onclick="switchScreen('analysis')" data-nav="analysis" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all-custom text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-200">
+                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                        <span>Paper Analysis</span>
+                    </button>
+                    <button onclick="switchScreen('compare')" data-nav="compare" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all-custom text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-200">
+                        <i data-lucide="git-compare" class="w-4 h-4"></i>
+                        <span>Compare Papers</span>
+                    </button>
+                    <button onclick="switchScreen('evaluation')" data-nav="evaluation" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all-custom text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-200">
+                        <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+                        <span>Evaluation</span>
+                    </button>
+                    <button onclick="switchScreen('settings')" data-nav="settings" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all-custom text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-200">
+                        <i data-lucide="settings" class="w-4 h-4"></i>
+                        <span>Settings</span>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Sidebar Footer -->
+            <div class="p-4 border-t border-slate-100 dark:border-slate-800/60 space-y-3">
+                <!-- State Toggle Switch (Screen 6 demo requirement) -->
+                <div class="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700/50 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="sparkles" class="w-4 h-4 text-indigo-500"></i>
+                        <span class="text-xs font-medium text-slate-700 dark:text-slate-300">Empty State Demo</span>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="empty-state-toggle" class="sr-only peer" onchange="toggleEmptyState(this.checked)">
+                        <div class="w-8 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-indigo-600"></div>
+                    </label>
+                </div>
+
+                <!-- Theme Toggle & Profile -->
+                <div class="flex items-center justify-between pt-1">
+                    <div class="flex items-center gap-3">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces" alt="Dr. Eleanor Vance" class="w-9 h-9 rounded-full object-cover ring-2 ring-indigo-500/20">
+                        <div class="overflow-hidden">
+                            <p class="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">Dr. Eleanor V.</p>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate">NLP Lead, MIT AI</p>
+                        </div>
+                    </div>
+                    <button onclick="toggleDarkMode()" class="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" title="Toggle Theme">
+                        <i data-lucide="moon" id="theme-icon" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col overflow-hidden bg-slate-50 dark:bg-navy-900">
+            
+            <!-- Top Navigation Bar -->
+            <header class="h-16 px-8 bg-white dark:bg-navy-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0 z-10">
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                        <span id="breadcrumb-category" class="font-medium text-slate-800 dark:text-slate-200">Workspace</span>
+                        <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                        <span id="breadcrumb-page" class="text-indigo-600 dark:text-indigo-400 font-medium">Dashboard</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <div class="relative hidden sm:block">
+                        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" placeholder="Search papers, embeddings, concepts..." class="w-64 pl-9 pr-4 py-1.5 text-xs bg-slate-100 dark:bg-slate-800 border border-transparent focus:border-indigo-500 rounded-lg outline-none text-slate-800 dark:text-slate-200 transition-all">
+                    </div>
+                    <button onclick="switchScreen('upload')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow-sm shadow-indigo-500/25 flex items-center gap-2 transition-all active:scale-95">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        <span>Upload Research Papers</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Screens Container -->
+            <div id="screens-container" class="flex-1 overflow-y-auto relative">
+                
+                <!-- SCREEN 1: DASHBOARD -->
+                <section id="screen-dashboard" class="screen-view p-8 space-y-8 max-w-7xl mx-auto">
+                    <!-- Header banner -->
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-200 dark:border-slate-800">
+                        <div>
+                            <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Research Intelligence Dashboard</h2>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Real-time AI NLP analytics and structured digests of your scientific corpus.</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="showToast('Exported summary report to PDF', 'success')" class="px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-lg flex items-center gap-2 transition-all">
+                                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                                <span>Export Report</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Summary Stats Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                        <div class="bg-white dark:bg-navy-850 p-5 rounded-2xl border border-slate-200 dark:border-slate-800/80 shadow-sm flex flex-col justify-between">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Papers Analyzed</span>
+                                <div class="p-2 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+                                    <i data-lucide="file-check" class="w-4 h-4"></i>
+                                </div>
+                            </div>
+                            <div class="mt-4 flex items-baseline gap-2">
+                                <span class="text-3xl font-bold text-slate-900 dark:text-white">28</span>
+                                <span class="text-xs font-medium text-emerald-600 dark:text-emerald-400 flex items-center">+4 this week</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white dark:bg-navy-850 p-5 rounded-2xl border border-slate-200 dark:border-slate-800/80 shadow-sm flex flex-col justify-between">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Papers Compared</span>
+                                <div class="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+                                    <i data-lucide="git-compare" class="w-4 h-4"></i>
+                                </div>
+                            </div>
+                            <div class="mt-4 flex items-baseline gap-2">
+                                <span class="text-3xl font-bold text-slate-900 dark:text-white">14</span>
+                                <span class="text-xs font-medium text-indigo-600 dark:text-indigo-400">Cross-domain</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white dark:bg-navy-850 p-5 rounded-2xl border border-slate-200 dark:border-slate-800/80 shadow-sm flex flex-col justify-between">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Average ROUGE Score</span>
+                                <div class="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400">
+                                    <i data-lucide="award" class="w-4 h-4"></i>
+                                </div>
+                            </div>
+                            <div class="mt-4 flex items-baseline gap-2">
+                                <span class="text-3xl font-bold text-slate-900 dark:text-white">0.428</span>
+                                <span class="text-xs font-medium text-emerald-600 dark:text-emerald-400">+3.2% vs baseline</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white dark:bg-navy-850 p-5 rounded-2xl border border-slate-200 dark:border-slate-800/80 shadow-sm flex flex-col justify-between">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Recent Analyses</span>
+                                <div class="p-2 rounded-xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
+                                    <i data-lucide="activity" class="w-4 h-4"></i>
+                                </div>
+                            </div>
+                            <div class="mt-4 flex items-baseline gap-2">
+                                <span class="text-3xl font-bold text-slate-900 dark:text-white">6</span>
+                                <span class="text-xs font-medium text-slate-500">Processed today</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Start Card -->
+                    <div class="relative overflow-hidden bg-gradient-to-r from-indigo-900 via-blue-900 to-navy-900 text-white rounded-2xl p-8 shadow-xl">
+                        <div class="absolute right-0 top-0 translate-x-12 -translate-y-12 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                        <div class="relative z-10 max-w-xl">
+                            <span class="px-3 py-1 bg-indigo-500/30 text-indigo-200 rounded-full text-xs font-semibold tracking-wide uppercase">Quick Start Digest</span>
+                            <h3 class="text-xl font-bold mt-3">Upload a research paper to generate a structured research digest.</h3>
+                            <p class="text-slate-300 text-sm mt-2 leading-relaxed">PaperLens extracts objectives, datasets, methodologies, and quantitative results instantly using fine-tuned LED transformer models.</p>
+                            <div class="mt-6 flex items-center gap-4">
+                                <button onclick="switchScreen('upload')" class="bg-white text-navy-900 font-semibold px-5 py-2.5 rounded-xl text-xs hover:bg-slate-100 transition-all shadow-lg active:scale-95 flex items-center gap-2">
+                                    <i data-lucide="upload-cloud" class="w-4 h-4 text-indigo-600"></i>
+                                    <span>Upload Research PDF</span>
+                                </button>
+                                <button onclick="switchScreen('compare')" class="text-white border border-white/20 hover:bg-white/10 px-5 py-2.5 rounded-xl text-xs font-semibold transition-all">
+                                    Compare Papers
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Papers Section -->
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-bold text-slate-900 dark:text-white">Recent Papers</h3>
+                            <button onclick="switchScreen('mypapers')" class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">View all papers (28) &rarr;</button>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="dashboard-papers-grid">
+                            <!-- Populated dynamically / static cards -->
+                            <div class="bg-white dark:bg-navy-850 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:border-indigo-500/50 transition-all group">
+                                <div>
+                                    <div class="flex items-start justify-between gap-2">
+                                        <span class="px-2.5 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[11px] font-semibold rounded-md">NLP & LLMs</span>
+                                        <span class="text-xs text-slate-400">Oct 14, 2026</span>
+                                    </div>
+                                    <h4 class="font-bold text-slate-900 dark:text-white mt-3 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2">Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</h4>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Patrick Lewis, Ethan Perez, Aleksandra Piktus et al.</p>
+                                </div>
+                                <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                                    <div class="flex items-center gap-3 text-xs text-slate-500">
+                                        <span>14 pages</span>
+                                        <span>•</span>
+                                        <span class="text-emerald-600 dark:text-emerald-400 font-medium">Ready</span>
+                                    </div>
+                                    <button onclick="switchScreen('analysis')" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-lg transition-all">
+                                        View Analysis
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="bg-white dark:bg-navy-850 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:border-indigo-500/50 transition-all group">
+                                <div>
+                                    <div class="flex items-start justify-between gap-2">
+                                        <span class="px-2.5 py-1 bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 text-[11px] font-semibold rounded-md">Transformers</span>
+                                        <span class="text-xs text-slate-400">Sep 28, 2026</span>
+                                    </div>
+                                    <h4 class="font-bold text-slate-900 dark:text-white mt-3 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2">Longformer: The Long-Document Transformer</h4>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Iz Beltagy, Matthew E. Peters, Arman Cohan</p>
+                                </div>
+                                <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                                    <div class="flex items-center gap-3 text-xs text-slate-500">
+                                        <span>18 pages</span>
+                                        <span>•</span>
+                                        <span class="text-emerald-600 dark:text-emerald-400 font-medium">Ready</span>
+                                    </div>
+                                    <button onclick="switchScreen('analysis')" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-lg transition-all">
+                                        View Analysis
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="bg-white dark:bg-navy-850 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:border-indigo-500/50 transition-all group">
+                                <div>
+                                    <div class="flex items-start justify-between gap-2">
+                                        <span class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-[11px] font-semibold rounded-md">Alignment</span>
+                                        <span class="text-xs text-slate-400">Aug 15, 2026</span>
+                                    </div>
+                                    <h4 class="font-bold text-slate-900 dark:text-white mt-3 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2">Direct Preference Optimization: Your Language Model is Secretly a Reward Model</h4>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Rafael Rafailov, Archit Sharma, Eric Mitchell et al.</p>
+                                </div>
+                                <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                                    <div class="flex items-center gap-3 text-xs text-slate-500">
+                                        <span>12 pages</span>
+                                        <span>•</span>
+                                        <span class="text-emerald-600 dark:text-emerald-400 font-medium">Ready</span>
+                                    </div>
+                                    <button onclick="switchScreen('analysis')" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-lg transition-all">
+                                        View Analysis
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SCREEN 2: UPLOAD / ANALYZE -->
+                <section id="screen-upload" class="screen-view p-8 space-y-8 max-w-5xl mx-auto hidden">
+                    <div>
+                        <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Analyze Research Papers</h2>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Upload 1–5 research papers to generate structured summaries, citations, and critical insights.</p>
+                    </div>
+
+                    <!-- Drag & Drop Zone -->
+                    <div id="drop-zone" class="border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500 rounded-2xl p-10 text-center bg-white dark:bg-navy-850 transition-all cursor-pointer relative group">
+                        <input type="file" id="file-input" multiple accept=".pdf" class="absolute inset-0 opacity-0 cursor-pointer" onchange="handleFileSelect(event)">
+                        <div class="mx-auto w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <i data-lucide="upload-cloud" class="w-8 h-8"></i>
+                        </div>
+                        <h3 class="text-base font-bold text-slate-800 dark:text-slate-200">Drop PDF files here</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">or <span class="text-indigo-600 dark:text-indigo-400 font-semibold">Browse Files</span> from your computer (Up to 5 files, 50MB max each)</p>
+                    </div>
+
+                    <!-- Uploaded Files List -->
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-sm font-bold text-slate-800 dark:text-slate-200">Selected Papers (<span id="file-count">2</span>/5)</h4>
+                            <button onclick="clearFiles()" class="text-xs text-red-500 hover:underline">Clear all</button>
+                        </div>
+
+                        <div id="uploaded-files-list" class="space-y-3">
+                            <!-- Default simulated files -->
+                            <div class="bg-white dark:bg-navy-850 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between shadow-sm">
+                                <div class="flex items-center gap-3">
+                                    <div class="p-2.5 rounded-lg bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400">
+                                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-bold text-slate-800 dark:text-slate-200">Attention_Is_All_You_Need.pdf</p>
+                                        <p class="text-[11px] text-slate-400 mt-0.5">4.2 MB • 15 pages</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <span class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 text-[11px] font-medium rounded-full flex items-center gap-1.5">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Ready
+                                    </span>
+                                    <button onclick="removeFile(this)" class="p-1.5 text-slate-400 hover:text-red-500 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="bg-white dark:bg-navy-850 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between shadow-sm">
+                                <div class="flex items-center gap-3">
+                                    <div class="p-2.5 rounded-lg bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400">
+                                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-bold text-slate-800 dark:text-slate-200">Language_Models_are_Few-Shot_Learners.pdf</p>
+                                        <p class="text-[11px] text-slate-400 mt-0.5">8.7 MB • 75 pages</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <span class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 text-[11px] font-medium rounded-full flex items-center gap-1.5">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Ready
+                                    </span>
+                                    <button onclick="removeFile(this)" class="p-1.5 text-slate-400 hover:text-red-500 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Processing Progress Simulation Box (Hidden by default) -->
+                    <div id="processing-box" class="hidden bg-white dark:bg-navy-850 p-6 rounded-2xl border border-indigo-500/30 shadow-lg space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-sm font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                                <i data-lucide="loader-2" class="w-4 h-4 animate-spin text-indigo-600"></i>
+                                <span id="processing-stage-title">Extracting paper text and vectors...</span>
+                            </h4>
+                            <span id="processing-percentage" class="text-xs font-bold text-indigo-600 dark:text-indigo-400">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                            <div id="processing-progress-bar" class="bg-indigo-600 h-full w-0 transition-all duration-300"></div>
+                        </div>
+                        <div class="grid grid-cols-4 gap-2 pt-2 text-center text-[11px]">
+                            <div id="step-1" class="text-slate-400 font-medium">1. Extracting</div>
+                            <div id="step-2" class="text-slate-400 font-medium">2. Detecting Sections</div>
+                            <div id="step-3" class="text-slate-400 font-medium">3. Summarizing</div>
+                            <div id="step-4" class="text-slate-400 font-medium">4. Preparing Insights</div>
+                        </div>
+                    </div>
+
+                    <!-- Primary Action -->
+                    <div class="flex justify-end pt-4">
+                        <button onclick="startAnalysisSimulation()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-xl text-sm shadow-md shadow-indigo-500/25 flex items-center gap-2 transition-all active:scale-95">
+                            <i data-lucide="sparkles" class="w-4 h-4"></i>
+                            <span>Analyze Papers</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- SCREEN 3: PAPER ANALYSIS -->
+                <section id="screen-analysis" class="screen-view h-full flex flex-col hidden">
+                    <!-- Top Paper Info Header -->
+                    <div class="bg-white dark:bg-navy-850 px-8 py-5 border-b border-slate-200 dark:border-slate-800 shrink-0">
+                        <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div>
+                                <div class="flex items-center gap-2 mb-1.5">
+                                    <span class="px-2.5 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-semibold rounded">NeurIPS 2024</span>
+                                    <span class="text-xs text-slate-400">DOI: 10.48550/arXiv.1706.03762</span>
+                                </div>
+                                <h2 class="text-xl font-bold text-slate-900 dark:text-white">Attention Is All You Need</h2>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Łukasz Kaiser, Illia Polosukhin</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <button onclick="showToast('Downloaded Markdown Report', 'success')" class="px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-lg flex items-center gap-2 transition-all">
+                                    <i data-lucide="download" class="w-4 h-4"></i>
+                                    <span>Export Digest</span>
+                                </button>
+                                <button onclick="showToast('Paper bookmarked to My Papers', 'success')" class="p-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg">
+                                    <i data-lucide="bookmark" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Analysis Tabs -->
+                        <div class="max-w-7xl mx-auto flex items-center gap-2 overflow-x-auto mt-6 border-b border-slate-100 dark:border-slate-800">
+                            <button onclick="switchAnalysisTab('overview')" data-tab="overview" class="analysis-tab px-4 py-2.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 transition-all whitespace-nowrap">Overview</button>
+                            <button onclick="switchAnalysisTab('problem')" data-tab="problem" class="analysis-tab px-4 py-2.5 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border-b-2 border-transparent transition-all whitespace-nowrap">Problem</button>
+                            <button onclick="switchAnalysisTab('method')" data-tab="method" class="analysis-tab px-4 py-2.5 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border-b-2 border-transparent transition-all whitespace-nowrap">Method</button>
+                            <button onclick="switchAnalysisTab('dataset')" data-tab="dataset" class="analysis-tab px-4 py-2.5 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border-b-2 border-transparent transition-all whitespace-nowrap">Dataset</button>
+                            <button onclick="switchAnalysisTab('results')" data-tab="results" class="analysis-tab px-4 py-2.5 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border-b-2 border-transparent transition-all whitespace-nowrap">Results</button>
+                            <button onclick="switchAnalysisTab('limitations')" data-tab="limitations" class="analysis-tab px-4 py-2.5 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border-b-2 border-transparent transition-all whitespace-nowrap">Limitations</button>
+                            <button onclick="switchAnalysisTab('conclusion')" data-tab="conclusion" class="analysis-tab px-4 py-2.5 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border-b-2 border-transparent transition-all whitespace-nowrap">Conclusion</button>
+                        </div>
+                    </div>
+
+                    <!-- Split Workspace Content -->
+                    <div class="flex-1 overflow-y-auto p-8">
+                        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            
+                            <!-- Left Main Content (Structured Cards) -->
+                            <div class="lg:col-span-2 space-y-6">
+                                
+                                <!-- AI Summary Hero Card -->
+                                <div class="bg-gradient-to-br from-blue-900/90 to-indigo-950 text-white p-6 rounded-2xl shadow-md relative overflow-hidden">
+                                    <div class="absolute right-0 top-0 translate-x-8 -translate-y-8 w-48 h-48 bg-indigo-500/20 rounded-full blur-2xl pointer-events-none"></div>
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <i data-lucide="sparkles" class="w-4 h-4 text-indigo-400"></i>
+                                        <h3 class="text-xs font-bold uppercase tracking-wider text-indigo-300">AI Executive Summary</h3>
+                                    </div>
+                                    <p class="text-sm text-slate-200 leading-relaxed">
+                                        The paper proposes the <strong>Transformer</strong>, a novel network architecture eschewing recurrence and convolutions entirely in favor of multi-head attention mechanisms. Achieving state-of-the-art translation quality on WMT 2014 English-to-German and English-to-French tasks while requiring significantly less parallelizable training time.
+                                    </p>
+                                </div>
+
+                                <!-- Tab Content Sections -->
+                                <div class="space-y-6" id="analysis-sections-container">
+                                    
+                                    <!-- Problem -->
+                                    <div class="bg-white dark:bg-navy-850 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                                        <div class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-semibold text-xs uppercase tracking-wider">
+                                            <i data-lucide="help-circle" class="w-4 h-4"></i>
+                                            <span>Problem Statement</span>
+                                        </div>
+                                        <h4 class="text-base font-bold text-slate-900 dark:text-white">What problem does the research address?</h4>
+                                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                                            Existing recurrent models (RNNs, LSTMs, GRUs) factor computation along sequence timesteps. This sequential nature precludes parallelization across training examples, which becomes critical at longer sequence lengths. Attention mechanisms had previously been used solely as auxiliary adjuncts to recurrent encoders, leaving sequential bottlenecks intact.
+                                        </p>
+                                    </div>
+
+                                    <!-- Method -->
+                                    <div class="bg-white dark:bg-navy-850 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                                        <div class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-semibold text-xs uppercase tracking-wider">
+                                            <i data-lucide="cpu" class="w-4 h-4"></i>
+                                            <span>Methodology</span>
+                                        </div>
+                                        <h4 class="text-base font-bold text-slate-900 dark:text-white">What approach was proposed?</h4>
+                                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                                            The Transformer architecture relies entirely on <strong>Scaled Dot-Product Attention</strong> and <strong>Multi-Head Attention</strong>. By projecting queries, keys, and values $d_k, d_k,$ and $d_v$ dimensions $h$ times in parallel, the model can jointly attend to information from different representation subspaces at different positions. Positional encodings are added to input embeddings to preserve sequence order.
+                                        </p>
+                                    </div>
+
+                                    <!-- Dataset -->
+                                    <div class="bg-white dark:bg-navy-850 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                                        <div class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-semibold text-xs uppercase tracking-wider">
+                                            <i data-lucide="database" class="w-4 h-4"></i>
+                                            <span>Dataset & Experimental Setup</span>
+                                        </div>
+                                        <h4 class="text-base font-bold text-slate-900 dark:text-white">What dataset was used?</h4>
+                                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                                            Trained on the <strong>WMT 2014 English-German dataset</strong> (4.5 million sentence pairs) and the <strong>WMT 2014 English-French dataset</strong> (36 million sentences). Evaluated on standard test benchmarks using byte-pair encoding with shared source-target vocabularies.
+                                        </p>
+                                    </div>
+
+                                    <!-- Results -->
+                                    <div class="bg-white dark:bg-navy-850 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                                        <div class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-semibold text-xs uppercase tracking-wider">
+                                            <i data-lucide="trending-up" class="w-4 h-4"></i>
+                                            <span>Major Results</span>
+                                        </div>
+                                        <h4 class="text-base font-bold text-slate-900 dark:text-white">What were the reported outcomes?</h4>
+                                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                                            The Transformer (big model) established a new state-of-the-art on the WMT 2014 English-to-German translation task with a BLEU score of <strong>28.4</strong>, improving over existing best results by over 2 BLEU while taking a fraction of training cost (3.5 days on 8 P100 GPUs).
+                                        </p>
+                                    </div>
+
+                                    <!-- Limitations -->
+                                    <div class="bg-white dark:bg-navy-850 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                                        <div class="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-semibold text-xs uppercase tracking-wider">
+                                            <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+                                            <span>Limitations</span>
+                                        </div>
+                                        <h4 class="text-base font-bold text-slate-900 dark:text-white">Identified weaknesses and constraints</h4>
+                                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                                            Quadratic complexity $O(N^2)$ with respect to sequence length $N$, making it computationally expensive for extremely long documents without sparse attention approximations. Also relies heavily on large batch sizes and extensive hyperparameter tuning.
+                                        </p>
+                                    </div>
+
+                                    <!-- Conclusion -->
+                                    <div class="bg-white dark:bg-navy-850 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                                        <div class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-semibold text-xs uppercase tracking-wider">
+                                            <i data-lucide="check-circle" class="w-4 h-4"></i>
+                                            <span>Conclusion</span>
+                                        </div>
+                                        <h4 class="text-base font-bold text-slate-900 dark:text-white">Final takeaways</h4>
+                                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                                            Demonstrates that attention-only architectures can completely replace recurrent layers in sequence transduction models, opening new horizons for scalable pre-trained foundation models across language, vision, and multi-modal domains.
+                                        </p>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- Right-side Metadata Info Panel -->
+                            <div class="space-y-6">
+                                <div class="bg-white dark:bg-navy-850 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-5 sticky top-6">
+                                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Paper Metadata & Entities</h4>
+                                    
+                                    <div class="space-y-4">
+                                        <div>
+                                            <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Research Domain</span>
+                                            <p class="text-xs font-bold text-slate-800 dark:text-slate-200 mt-1">Natural Language Processing / Deep Learning</p>
+                                        </div>
+
+                                        <div>
+                                            <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Models Used</span>
+                                            <div class="flex flex-wrap gap-1.5 mt-1.5">
+                                                <span class="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[11px] rounded font-medium">Transformer</span>
+                                                <span class="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[11px] rounded font-medium">Multi-Head Attention</span>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Primary Dataset</span>
+                                            <p class="text-xs font-bold text-slate-800 dark:text-slate-200 mt-1">WMT 2014 English-German / English-French</p>
+                                        </div>
+
+                                        <div>
+                                            <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Key Topics</span>
+                                            <div class="flex flex-wrap gap-1.5 mt-1.5">
+                                                <span class="px-2 py-0.5 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 text-[11px] rounded-full">Self-Attention</span>
+                                                <span class="px-2 py-0.5 bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 text-[11px] rounded-full">Sequence Transduction</span>
+                                                <span class="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 text-[11px] rounded-full">Encoder-Decoder</span>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Important Keywords</span>
+                                            <p class="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">Neural Machine Translation, Scaled Dot-Product, Positional Encoding, Parallelization.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="pt-4 border-t border-slate-100 dark:border-slate-800">
+                                        <button onclick="showToast('Embeddings synced to workspace vector store', 'success')" class="w-full py-2 bg-indigo-50 dark:bg-indigo-950/50 hover:bg-indigo-100 text-indigo-600 dark:text-indigo-400 font-semibold text-xs rounded-xl transition-all flex items-center justify-center gap-2">
+                                            <i data-lucide="database" class="w-3.5 h-3.5"></i>
+                                            <span>Inspect Vector Embeddings</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SCREEN 4: COMPARE PAPERS -->
+                <section id="screen-compare" class="screen-view p-8 space-y-8 max-w-7xl mx-auto hidden">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Compare Research Papers</h2>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Cross-examine methodologies, datasets, and results across multiple publications neutrally.</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <select class="px-3 py-2 bg-white dark:bg-navy-850 border border-slate-200 dark:border-slate-700 text-xs font-semibold rounded-lg text-slate-700 dark:text-slate-300 outline-none">
+                                <option>Comparing 3 Selected Papers</option>
+                                <option>Select 5 Papers for Matrix</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Comparison Table -->
+                    <div class="bg-white dark:bg-navy-850 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                        <th class="p-4 w-1/5">Category</th>
+                                        <th class="p-4 w-1/4 border-l border-slate-200 dark:border-slate-800">
+                                            <div class="text-slate-900 dark:text-white font-bold">Paper A</div>
+                                            <div class="text-[11px] text-indigo-600 dark:text-indigo-400 font-normal mt-0.5">Attention Is All You Need</div>
+                                        </th>
+                                        <th class="p-4 w-1/4 border-l border-slate-200 dark:border-slate-800">
+                                            <div class="text-slate-900 dark:text-white font-bold">Paper B</div>
+                                            <div class="text-[11px] text-indigo-600 dark:text-indigo-400 font-normal mt-0.5">Longformer: Long-Document Transformer</div>
+                                        </th>
+                                        <th class="p-4 w-1/4 border-l border-slate-200 dark:border-slate-800">
+                                            <div class="text-slate-900 dark:text-white font-bold">Paper C</div>
+                                            <div class="text-[11px] text-indigo-600 dark:text-indigo-400 font-normal mt-0.5">Direct Preference Optimization</div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-xs text-slate-700 dark:text-slate-300">
+                                    <tr>
+                                        <td class="p-4 font-bold text-slate-900 dark:text-white bg-slate-50/50 dark:bg-slate-900/20">Problem</td>
+                                        <td class="p-4 border-l border-slate-100 dark:border-slate-800 leading-relaxed">Sequential bottleneck and lack of parallelization in recurrent neural architectures.</td>
+                                        <td class="p-4 border-l border-slate-100 dark:border-slate-800 leading-relaxed">Quadratic $O(N^2)$ time complexity of self-attention on long sequences.</td>
+                                        <td class="p-4 border-l border-slate-100 dark:border-slate-800 leading-relaxed">Instability and complexity of reinforcement learning from human feedback (RLHF).</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-4 font-bold text-slate-900 dark:text-white bg-slate-50/50 dark:bg-slate-900/20">Method</td>
+                                        <td class="p-4 border-l border-slate-100 dark:border-slate-800 leading-relaxed">Multi-head scaled dot-product self-attention encoder-decoder structure.</td>
+                                        <td class="p-4 border-l border-slate-100 dark:border-slate-800 leading-relaxed">Combines local sliding window attention with global task-specific attention.</td>
+                                        <td class="p-4 border-l border-slate-100 dark:border-slate-800 leading-relaxed">Directly parameterizes reward model in terms of optimal policy for exact loss optimization.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-4 font-bold text-slate-900 dark:text-white bg-slate-50/50 dark:bg-slate-900/20">Dataset</td>
+                                        <td class="p-4 border-l border-slate-100 dark:border-slate-800 leading-relaxed">WMT 2014 English-German & English-French translation corpora.</td>
+                                        <td class="p-4 border-l border-slate-100 dark:border-slate-800 leading-relaxed">WikiHop, TriviaQA, and Long-Range Arena (LRA) benchmarks.</td>
+                                        <td class="p-4 border-l border-slate-100 dark:border-slate-800 leading-relaxed">Anthropic HH-RLHF and Reddit TL;DR summarization datasets.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-4 font-bold text-slate-900 dark:text-white bg-slate-50/50 dark:bg-slate-900/20">Results</td>
+                                        <td class="p-4 border-l border-slate-100 dark:border-slate-800 leading-relaxed">28.4 BLEU on En-De; state-of-the-art translation accuracy with lower training cost.</td>
+                                        <td class="p-4 border-l border-slate-100 dark:border-slate-800 leading-relaxed">Outperforms standard BERT/RoBERTa on long document QA with linear scaling.</td>
+                                        <td class="p-4 border-l border-slate-100 dark:border-slate-800 leading-relaxed">Matches or exceeds RLHF performance without requiring separate reward modeling.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-4 font-bold text-slate-900 dark:text-white bg-slate-50/50 dark:bg-slate-900/20">Limitations</td>
+                                        <td class="p-4 border-l border-slate-100 dark:border-slate-800 leading-relaxed">High memory footprint for very long inputs due to dense pairwise attention matrix.</td>
+                                        <td class="p-4 border-l border-slate-100 dark:border-slate-800 leading-relaxed">Requires custom CUDA kernels for efficient sparse attention computation.</td>
+                                        <td class="p-4 border-l border-slate-100 dark:border-slate-800 leading-relaxed">May exhibit sensitivity to sampling temperature and prompt distribution shifts.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Neutral Insight Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white dark:bg-navy-850 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                            <div class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-semibold text-xs uppercase tracking-wider">
+                                <i data-lucide="git-merge" class="w-4 h-4"></i>
+                                <span>Common Approaches</span>
+                            </div>
+                            <h4 class="text-sm font-bold text-slate-900 dark:text-white">Attention Paradigms</h4>
+                            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                                All three papers build directly upon transformer-based sequence modeling, replacing recurrence or complex reinforcement learning loops with mathematically tractable feedforward and attention formulations.
+                            </p>
+                        </div>
+
+                        <div class="bg-white dark:bg-navy-850 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                            <div class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-semibold text-xs uppercase tracking-wider">
+                                <i data-lucide="sliders" class="w-4 h-4"></i>
+                                <span>Key Differences</span>
+                            </div>
+                            <h4 class="text-sm font-bold text-slate-900 dark:text-white">Optimization Objectives</h4>
+                            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                                While Paper A focuses on core architectural translation speed, Paper B optimizes memory scaling for long contexts, and Paper C refines alignment loss functions without reward models.
+                            </p>
+                        </div>
+
+                        <div class="bg-white dark:bg-navy-850 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                            <div class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-semibold text-xs uppercase tracking-wider">
+                                <i data-lucide="search" class="w-4 h-4"></i>
+                                <span>Research Gaps</span>
+                            </div>
+                            <h4 class="text-sm font-bold text-slate-900 dark:text-white">Unexplored Frontiers</h4>
+                            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                                Opportunities remain in unifying efficient sparse attention with direct preference optimization for multi-modal ultra-long document reasoning tasks.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SCREEN 5: EVALUATION -->
+                <section id="screen-evaluation" class="screen-view p-8 space-y-8 max-w-7xl mx-auto hidden">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Model Evaluation Dashboard</h2>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Quantitative ROUGE metric benchmarks comparing classical TF-IDF extraction against LED Transformer summarization.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-3 py-1 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 text-xs font-semibold rounded-lg">Test Set: arXiv Corpus (N=1,200)</span>
+                        </div>
+                    </div>
+
+                    <!-- Metrics Comparison Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        
+                        <!-- ROUGE-1 -->
+                        <div class="bg-white dark:bg-navy-850 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">ROUGE-1 Score</span>
+                                <span class="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[11px] font-semibold rounded">Unigram Overlap</span>
+                            </div>
+                            <div class="flex items-baseline justify-between pt-2">
+                                <div>
+                                    <p class="text-2xl font-bold text-slate-900 dark:text-white">0.452</p>
+                                    <p class="text-[11px] text-slate-400 mt-0.5">LED Transformer</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xl font-semibold text-slate-500">0.312</p>
+                                    <p class="text-[11px] text-slate-400 mt-0.5">TF-IDF Baseline</p>
+                                </div>
+                            </div>
+                            <div class="space-y-2 pt-2">
+                                <div>
+                                    <div class="flex justify-between text-[11px] mb-1 font-medium text-slate-600 dark:text-slate-400">
+                                        <span>LED Transformer</span>
+                                        <span class="text-indigo-600 font-bold">45.2%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                                        <div class="bg-indigo-600 h-full rounded-full" style="width: 75%;"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-[11px] mb-1 font-medium text-slate-600 dark:text-slate-400">
+                                        <span>TF-IDF Baseline</span>
+                                        <span>31.2%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                                        <div class="bg-slate-400 h-full rounded-full" style="width: 52%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ROUGE-2 -->
+                        <div class="bg-white dark:bg-navy-850 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">ROUGE-2 Score</span>
+                                <span class="px-2 py-0.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-[11px] font-semibold rounded">Bigram Overlap</span>
+                            </div>
+                            <div class="flex items-baseline justify-between pt-2">
+                                <div class="text-slate-900 dark:text-white">
+                                    <p class="text-2xl font-bold">0.218</p>
+                                    <p class="text-[11px] text-slate-400 mt-0.5">LED Transformer</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xl font-semibold text-slate-500">0.134</p>
+                                    <p class="text-[11px] text-slate-400 mt-0.5">TF-IDF Baseline</p>
+                                </div>
+                            </div>
+                            <div class="space-y-2 pt-2">
+                                <div>
+                                    <div class="flex justify-between text-[11px] mb-1 font-medium text-slate-600 dark:text-slate-400">
+                                        <span>LED Transformer</span>
+                                        <span class="text-indigo-600 font-bold">21.8%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                                        <div class="bg-indigo-600 h-full rounded-full" style="width: 68%;"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-[11px] mb-1 font-medium text-slate-600 dark:text-slate-400">
+                                        <span>TF-IDF Baseline</span>
+                                        <span>13.4%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                                        <div class="bg-slate-400 h-full rounded-full" style="width: 42%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ROUGE-L -->
+                        <div class="bg-white dark:bg-navy-850 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">ROUGE-L Score</span>
+                                <span class="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-[11px] font-semibold rounded">Longest Subsequence</span>
+                            </div>
+                            <div class="flex items-baseline justify-between pt-2">
+                                <div>
+                                    <p class="text-2xl font-bold text-slate-900 dark:text-white">0.428</p>
+                                    <p class="text-[11px] text-slate-400 mt-0.5">LED Transformer</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xl font-semibold text-slate-500">0.285</p>
+                                    <p class="text-[11px] text-slate-400 mt-0.5">TF-IDF Baseline</p>
+                                </div>
+                            </div>
+                            <div class="space-y-2 pt-2">
+                                <div>
+                                    <div class="flex justify-between text-[11px] mb-1 font-medium text-slate-600 dark:text-slate-400">
+                                        <span>LED Transformer</span>
+                                        <span class="text-indigo-600 font-bold">42.8%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                                        <div class="bg-indigo-600 h-full rounded-full" style="width: 72%;"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-[11px] mb-1 font-medium text-slate-600 dark:text-slate-400">
+                                        <span>TF-IDF Baseline</span>
+                                        <span>28.5%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                                        <div class="bg-slate-400 h-full rounded-full" style="width: 48%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Qualitative Analysis Cards -->
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-white">Qualitative Expert Assessment</h3>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                            <div class="bg-white dark:bg-navy-850 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Factuality</span>
+                                <p class="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-2">94.2%</p>
+                                <p class="text-[11px] text-slate-500 mt-1">High factual grounding against source PDF text.</p>
+                            </div>
+
+                            <div class="bg-white dark:bg-navy-850 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Coverage</span>
+                                <p class="text-xl font-bold text-blue-600 dark:text-blue-400 mt-2">89.6%</p>
+                                <p class="text-[11px] text-slate-500 mt-1">Comprehensive section preservation.</p>
+                            </div>
+
+                            <div class="bg-white dark:bg-navy-850 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Coherence</span>
+                                <p class="text-xl font-bold text-indigo-600 dark:text-indigo-400 mt-2">96.8%</p>
+                                <p class="text-[11px] text-slate-500 mt-1">Excellent logical flow and transition structure.</p>
+                            </div>
+
+                            <div class="bg-white dark:bg-navy-850 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Conciseness</span>
+                                <p class="text-xl font-bold text-purple-600 dark:text-purple-400 mt-2">91.4%</p>
+                                <p class="text-[11px] text-slate-500 mt-1">Eliminates verbose academic redundancy.</p>
+                            </div>
+
+                            <div class="bg-white dark:bg-navy-850 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Hallucination</span>
+                                <p class="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-2">&lt; 1.2%</p>
+                                <p class="text-[11px] text-slate-500 mt-1">Negligible fabricated citations or metrics.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Experiment Summary -->
+                    <div class="bg-white dark:bg-navy-850 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                        <div class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-semibold text-xs uppercase tracking-wider">
+                            <i data-lucide="info" class="w-4 h-4"></i>
+                            <span>Experiment Methodology Summary</span>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                            The evaluation benchmarks the fine-tuned <strong>LED (Long-Document Encoder-Decoder) Transformer</strong> against a classical statistical <strong>TF-IDF extractive summarization baseline</strong>. Evaluated across 1,200 peer-reviewed arXiv papers, the transformer architecture consistently achieves superior semantic abstraction, higher unigram/bigram overlap metrics, and significantly lower hallucination rates due to structured attention masking.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- SCREEN 6: EMPTY / FIRST-USE STATE -->
+                <section id="screen-empty" class="screen-view h-full flex items-center justify-center p-8 hidden">
+                    <div class="max-w-md w-full bg-white dark:bg-navy-850 p-10 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl text-center space-y-6">
+                        <div class="mx-auto w-20 h-20 rounded-3xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shadow-inner">
+                            <i data-lucide="file-search" class="w-10 h-10"></i>
+                        </div>
+                        <div class="space-y-2">
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Start exploring research</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                                Upload your first research paper and PaperLens will transform it into a structured research digest with instant vector search and cross-paper comparison.
+                            </p>
+                        </div>
+                        <button onclick="switchScreen('upload')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl text-xs shadow-md shadow-indigo-500/25 flex items-center justify-center gap-2 transition-all active:scale-95">
+                            <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+                            <span>Upload Paper</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- ADDITIONAL SCREENS FOR SIDEBAR COMPLETENESS -->
+                <section id="screen-mypapers" class="screen-view p-8 space-y-8 max-w-7xl mx-auto hidden">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">My Saved Research Papers</h2>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage and query your library of 12 indexed papers.</p>
+                        </div>
+                        <button onclick="switchScreen('upload')" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2">
+                            <i data-lucide="plus" class="w-4 h-4"></i> Add Paper
+                        </button>
+                    </div>
+                    <div class="bg-white dark:bg-navy-850 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 text-center space-y-3">
+                        <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">Displaying library corpus with active vector indexing.</p>
+                        <button onclick="switchScreen('analysis')" class="px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg">View Sample Paper Analysis</button>
+                    </div>
+                </section>
+
+                <section id="screen-settings" class="screen-view p-8 space-y-8 max-w-5xl mx-auto hidden">
+                    <div>
+                        <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Workspace Settings</h2>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Configure API keys, model parameters, and vector store integrations.</p>
+                    </div>
+                    <div class="bg-white dark:bg-navy-850 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+                        <h4 class="text-sm font-bold text-slate-800 dark:text-white">NLP Summarization Model</h4>
+                        <select class="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 outline-none">
+                            <option>LED-Base-16K (Fine-tuned on arXiv Corpus)</option>
+                            <option>Longformer-Encoder-Large</option>
+                            <option>GPT-4o Academic Summarizer</option>
+                        </select>
+                        <button onclick="showToast('Settings saved successfully', 'success')" class="px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-xl">Save Changes</button>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Script Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            switchScreen('dashboard');
+        });
+
+        // Navigation Switcher
+        function switchScreen(screenId) {
+            // Hide all screens
+            document.querySelectorAll('.screen-view').forEach(el => el.classList.add('hidden'));
+            
+            // Show target screen
+            const target = document.getElementById('screen-' + screenId);
+            if (target) target.classList.remove('hidden');
+
+            // Update sidebar active states
+            document.querySelectorAll('#sidebar-nav button').forEach(btn => {
+                btn.classList.remove('bg-slate-100', 'dark:bg-slate-800', 'text-indigo-600', 'dark:text-indigo-400', 'font-semibold');
+                btn.classList.add('text-slate-600', 'dark:text-slate-400');
+                if(btn.getAttribute('data-nav') === screenId) {
+                    btn.classList.add('bg-slate-100', 'dark:bg-slate-800', 'text-indigo-600', 'dark:text-indigo-400', 'font-semibold');
+                    btn.classList.remove('text-slate-600', 'dark:text-slate-400');
+                }
+            });
+
+            // Update breadcrumb
+            const categoryMap = {
+                'dashboard': ['Overview', 'Dashboard'],
+                'mypapers': ['Library', 'My Papers'],
+                'upload': ['Ingestion', 'Analyze Papers'],
+                'analysis': ['Intelligence', 'Paper Analysis'],
+                'compare': ['Intelligence', 'Compare Papers'],
+                'evaluation': ['Benchmarks', 'Model Evaluation'],
+                'settings': ['Configuration', 'Settings']
+            };
+            
+            const bread = categoryMap[screenId] || ['Workspace', screenId];
+            document.getElementById('breadcrumb-category').innerText = bread[0];
+            document.getElementById('breadcrumb-page').innerText = bread[1];
+            
+            lucide.createIcons();
+        }
+
+        // Toggle Empty State (Screen 6)
+        function toggleEmptyState(isEmpty) {
+            if(isEmpty) {
+                switchScreen('empty');
+                document.getElementById('empty-state-toggle').checked = true;
+            } else {
+                switchScreen('dashboard');
+                document.getElementById('empty-state-toggle').checked = false;
+            }
+        }
+
+        // Analysis Tab Switcher
+        function switchAnalysisTab(tabName) {
+            document.querySelectorAll('.analysis-tab').forEach(tab => {
+                tab.classList.remove('text-indigo-600', 'dark:text-indigo-400', 'border-indigo-600');
+                tab.classList.add('text-slate-600', 'dark:text-slate-400', 'border-transparent');
+                if(tab.getAttribute('data-tab') === tabName) {
+                    tab.classList.add('text-indigo-600', 'dark:text-indigo-400', 'border-indigo-600');
+                    tab.classList.remove('text-slate-600', 'dark:text-slate-400', 'border-transparent');
+                }
+            });
+            showToast('Loaded section: ' + tabName.toUpperCase(), 'info');
+        }
+
+        // Theme Toggle
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            html.classList.toggle('dark');
+            if(html.classList.contains('dark')) {
+                icon.setAttribute('data-lucide', 'sun');
+                showToast('Switched to Dark Mode', 'info');
+            } else {
+                icon.setAttribute('data-lucide', 'moon');
+                showToast('Switched to Light Mode', 'info');
+            }
+            lucide.createIcons();
+        }
+
+        // Toast Notification System
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const bgColors = type === 'success' ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900' : 'bg-indigo-600 text-white';
+            const iconName = type === 'success' ? 'check-circle' : 'info';
+
+            toast.className = `${bgColors} px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 text-xs font-semibold pointer-events-auto transition-all duration-300 translate-y-4 opacity-0`;
+            toast.innerHTML = `<i data-lucide="${iconName}" class="w-4 h-4 shrink-0"></i><span>${message}</span>`;
+            
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-4', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-4', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Multi-Stage Processing Simulation
+        function startAnalysisSimulation() {
+            const box = document.getElementById('processing-box');
+            const bar = document.getElementById('processing-progress-bar');
+            const pct = document.getElementById('processing-percentage');
+            const title = document.getElementById('processing-stage-title');
+            
+            box.classList.remove('hidden');
+            let progress = 0;
+
+            const interval = setInterval(() => {
+                progress += 2;
+                bar.style.width = progress + '%';
+                pct.innerText = progress + '%';
+
+                if(progress === 25) {
+                    title.innerText = "Extracting paper layout & structural embeddings...";
+                    document.getElementById('step-1').className = "text-indigo-600 font-bold";
+                } else if(progress === 50) {
+                    title.innerText = "Detecting sections (Problem, Method, Results)...";
+                    document.getElementById('step-2').className = "text-indigo-600 font-bold";
+                } else if(progress === 75) {
+                    title.innerText = "Generating abstractive AI summaries...";
+                    document.getElementById('step-3').className = "text-indigo-600 font-bold";
+                } else if(progress === 95) {
+                    title.innerText = "Preparing structured insights & metadata...";
+                    document.getElementById('step-4').className = "text-indigo-600 font-bold";
+                }
+
+                if(progress >= 100) {
+                    clearInterval(interval);
+                    showToast('Papers successfully analyzed!', 'success');
+                    setTimeout(() => {
+                        switchScreen('analysis');
+                        box.classList.add('hidden');
+                        bar.style.width = '0%';
+                    }, 1000);
+                }
+            }, 40);
+        }
+
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if(files.length > 0) {
+                showToast(`Added ${files.length} paper(s) to ingestion queue`, 'success');
+            }
+        }
+
+        function removeFile(btn) {
+            btn.closest('.bg-white').remove();
+            showToast('Removed paper from queue', 'info');
+        }
+
+        function clearFiles() {
+            document.getElementById('uploaded-files-list').innerHTML = '';
+            showToast('Cleared all files', 'info');
+        }
+    </script>
+</body>
+</html>

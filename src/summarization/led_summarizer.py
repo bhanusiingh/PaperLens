@@ -1,4 +1,4 @@
-﻿"""
+"""
 src/summarization/led_summarizer.py
 
 Transformer-based summarization using allenai/led-large-16384-arxiv.
@@ -33,7 +33,7 @@ if TYPE_CHECKING:
 # Config helpers
 # ---------------------------------------------------------------------------
 
-_DEFAULT_CONFIG = Path(__file__).resolve().parents[3] / "configs" / "config.yaml"
+_DEFAULT_CONFIG = Path(__file__).resolve().parents[2] / "configs" / "config.yaml"
 
 
 def _load_config(config_path: Path = _DEFAULT_CONFIG) -> dict:
@@ -128,7 +128,13 @@ class LEDSummarizer:
             Generated summary as a plain string.
         """
         tokenizer, _ = self._load_model()
+        
+        # Suppress the max_length warning since we handle chunking manually
+        old_max_len = tokenizer.model_max_length
+        tokenizer.model_max_length = int(1e9)
         token_ids: list[int] = tokenizer.encode(text, add_special_tokens=False)
+        tokenizer.model_max_length = old_max_len
+        
         n_tokens: int = len(token_ids)
 
         if n_tokens <= self.chunk_size:

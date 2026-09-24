@@ -167,8 +167,10 @@ class LEDSummarizer:
                 "cuda" if torch.cuda.is_available() else "cpu"
             )
             self._tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+            # FP16 on CUDA to halve VRAM usage (~3 GB vs ~6 GB); CPU must stay FP32.
+            torch_dtype = torch.float16 if self._device == "cuda" else torch.float32
             self._model = LEDForConditionalGeneration.from_pretrained(
-                self.model_name
+                self.model_name, torch_dtype=torch_dtype
             ).to(self._device)
             self._model.eval()
         return self._tokenizer, self._model
@@ -186,7 +188,9 @@ class LEDSummarizer:
             return_tensors="pt",
             max_length=self.chunk_size,
             truncation=True,
-            padding="max_length",
+            # No padding=max_length: dynamically pad to sequence length only.
+            # padding=max_length on a 16K-context window bloats the KV-cache
+            # and causes CUDA OOM / offloading on consumer GPUs.
         )
         input_ids = encoded["input_ids"].to(self._device)
         attention_mask = encoded["attention_mask"].to(self._device)
@@ -201,8 +205,8 @@ class LEDSummarizer:
                 attention_mask=attention_mask,
                 global_attention_mask=global_attention_mask,
                 min_length=self.min_output_tokens,
-                max_length=self.max_output_tokens,
-                num_beams=4,
+                max_new_tokens=self.max_output_tokens,
+                num_beams=1,          # Greedy decoding: no beam KV-cache expansion.
                 early_stopping=True,
                 no_repeat_ngram_size=3,
             )

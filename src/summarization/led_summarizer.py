@@ -207,7 +207,6 @@ class LEDSummarizer:
                 min_length=self.min_output_tokens,
                 max_new_tokens=self.max_output_tokens,
                 num_beams=1,          # Greedy decoding: no beam KV-cache expansion.
-                early_stopping=True,
                 no_repeat_ngram_size=3,
             )
 

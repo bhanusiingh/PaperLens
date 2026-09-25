@@ -1,4 +1,4 @@
-﻿"""
+"""
 experiments/evaluate.py
 
 Benchmark evaluation script for PaperLens.
@@ -146,7 +146,6 @@ def main() -> None:
         dataset_name,
         dataset_config,
         split=args.split,
-        trust_remote_code=True,
     )
     n = min(args.num_samples, len(dataset))
     samples = dataset.select(range(n))

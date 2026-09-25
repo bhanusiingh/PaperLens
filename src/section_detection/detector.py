@@ -1,4 +1,4 @@
-﻿"""
+"""
 src/section_detection/detector.py
 
 Rule-based section detector for research papers.
@@ -53,12 +53,12 @@ HEADING_PATTERNS: dict[str, str] = {
     r"^abstract$":                                    "abstract",
     r"^introduction":                                 "introduction",
     r"^related\s+work|^background|^prior\s+work|^literature\s+review": "related_work",
-    r"^method(ology)?$|^approach$|^proposed\s+(method|model|approach|framework)": "methodology",
-    r"^dataset$|^data\s+collection$|^data\s+preparation$": "dataset",
-    r"^experiment(s|al\s+setup)?$|^experimental\s+results$": "experiments",
+    r"^method(olog(y|ies)|s)?$|^approach(es)?$|^proposed\s+(method|model|approach|framework|architecture)$|^model(\s+architecture)?$|^models?$|^materials?\s+(and|&)\s+methods?$|^experimental?\s+setup$": "methodology",
+    r"^datasets?$|^data$|^data\s+(collection|preparation|preprocessing|description|sources?)$|^benchmark\s+datasets?$|^corpus$|^corpora$": "dataset",
+    r"^experiments?$|^experimental\s+results$":       "experiments",
     r"^results?$|^findings$|^quantitative\s+results?$": "results",
     r"^discussion$|^analysis$":                       "discussion",
-    r"^limitations?$":                                "limitations",
+    r"^limitations?$|^limitations?\s+and\s+(future\s+work|discussions?)$|^threats\s+to\s+validity$": "limitations",
     r"^conclusion(s)?$|^summary$|^concluding\s+remarks$": "conclusion",
 }
 

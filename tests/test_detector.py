@@ -1,4 +1,4 @@
-﻿"""
+"""
 tests/test_detector.py
 
 Unit tests for src/section_detection/detector.py (SectionDetector).
@@ -97,3 +97,41 @@ class TestSectionDetector:
 
     def test_normalize_heading_unknown_returns_other(self, detector):
         assert detector._normalize_heading("xyzzy foobar") == "other"
+
+    @pytest.mark.parametrize(
+        "heading",
+        [
+            "Model Architecture",
+            "3. Model Architecture",
+            "Model",
+            "3. Model",
+            "Proposed Method",
+            "Approach",
+            "Methodology",
+            "Methods",
+            "Materials and Methods",
+            "Experimental Setup",
+        ],
+    )
+    def test_methodology_equivalents_detected(self, detector, heading):
+        text = f"{heading}\nThis describes the methodology.\n"
+        paper = detector.detect(text)
+        labels = [s.label for s in paper.sections]
+        assert "methodology" in labels, f"Expected 'methodology' for '{heading}', got: {labels}"
+
+    @pytest.mark.parametrize(
+        "heading,expected_label",
+        [
+            ("Datasets", "dataset"),
+            ("Data", "dataset"),
+            ("Data Preprocessing", "dataset"),
+            ("Limitations and Future Work", "limitations"),
+            ("Threats to Validity", "limitations"),
+        ],
+    )
+    def test_dataset_and_limitations_equivalents(self, detector, heading, expected_label):
+        text = f"{heading}\nThis is the content.\n"
+        paper = detector.detect(text)
+        labels = [s.label for s in paper.sections]
+        assert expected_label in labels, f"Expected '{expected_label}' for '{heading}', got: {labels}"
+

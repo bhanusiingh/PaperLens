@@ -60,6 +60,7 @@ HEADING_PATTERNS: dict[str, str] = {
     r"^discussion$|^analysis$":                       "discussion",
     r"^limitations?$|^limitations?\s+and\s+(future\s+work|discussions?)$|^threats\s+to\s+validity$": "limitations",
     r"^conclusion(s)?$|^summary$|^concluding\s+remarks$": "conclusion",
+    r"^references?$|^bibliography$|^acknowledg(e)?ments?$": "other",
 }
 
 # Words that start a body sentence rather than a heading.

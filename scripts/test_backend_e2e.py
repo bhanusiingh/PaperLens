@@ -99,10 +99,17 @@ def run_test():
     print(f"  Preview: {tfidf_summary[:120].replace(chr(10), ' ')}...")
     assert len(tfidf_summary.strip()) > 0, "TF-IDF summary is empty!"
 
+    # Verify LED summary returned directly from /api/analyze
+    led_summary = paper.get("led_summary", "")
+    print(f"\n[Step 3b] LED Summary (generated during /api/analyze):")
+    print(f"  Length: {len(led_summary)} chars")
+    print(f"  Preview: {led_summary[:120].replace(chr(10), ' ')}...")
+    assert len(led_summary.strip()) > 0, "LED summary from /api/analyze is empty!"
+
     # -------------------------------------------------------------
-    # 2. POST /api/rouge (triggers on-demand LED summary + ROUGE evaluation)
+    # 2. POST /api/rouge (reuses existing LED summary + ROUGE evaluation)
     # -------------------------------------------------------------
-    print("\n[Step 4] Requesting POST /api/rouge (computes LED summary & ROUGE)...")
+    print("\n[Step 4] Requesting POST /api/rouge (scoring against cached LED & TF-IDF)...")
     t0 = time.time()
     rouge_payload = {
         "paper_id": paper_id,
@@ -114,7 +121,7 @@ def run_test():
     assert rouge_response.status_code == 200, f"Expected 200, got {rouge_response.status_code}: {rouge_response.text}"
     rouge_data = rouge_response.json()
     print(f"  Status code       : {rouge_response.status_code}")
-    print(f"  ROUGE runtime     : {rouge_time:.2f}s")
+    print(f"  ROUGE runtime     : {rouge_time:.2f}s (reusing cached LED, no duplicate inference)")
 
     # Verify ROUGE scores
     assert "tfidf" in rouge_data, "Missing tfidf in rouge response"

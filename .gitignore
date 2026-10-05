@@ -103,3 +103,11 @@ desktop.ini
 *.tmp
 tmp/
 temp/
+
+# Agent skills and lockfiles
+.agents/
+skills-lock.json
+
+# Scratch assets and reference mockups
+image.png
+reference/

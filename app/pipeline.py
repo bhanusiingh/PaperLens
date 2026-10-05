@@ -1,4 +1,4 @@
-﻿"""
+"""
 app/pipeline.py
 
 Orchestrates the PaperLens NLP pipeline for one or more PDF files.
@@ -22,6 +22,7 @@ from src.pdf.extractor import PDFExtractor
 from src.preprocessing.text_cleaner import TextCleaner
 from src.section_detection.detector import SectionDetector
 from src.summarization.tfidf_baseline import TFIDFSummarizer
+from src.summarization.section_digest import SectionDigestSummarizer
 
 # Digest dimension → canonical section keys (priority order)
 DIGEST_MAP: dict[str, list[str]] = {
@@ -39,8 +40,8 @@ def process_paper(pdf_path: str) -> dict:
     Run the full pipeline on a single PDF.
 
     Returns a dict with all data needed by the API.
-    LED summary is computed lazily on first request to avoid blocking
-    startup; TF-IDF is fast and always computed.
+    Runs extraction, text cleaning, section detection, structured digest,
+    TF-IDF baseline summarization, and LED abstractive summarization.
     """
     paper_id = str(uuid.uuid4())
     filename = Path(pdf_path).name
@@ -58,7 +59,8 @@ def process_paper(pdf_path: str) -> dict:
     section_dict = detected_paper.to_dict()
     detected_section_labels = [s.label for s in detected_paper.sections]
 
-    # 4. Build structured digest from raw section text
+    # 4. Build concise structured digest from detected section text
+    digest_summarizer = SectionDigestSummarizer()
     digest: dict[str, str] = {}
     for dim, source_keys in DIGEST_MAP.items():
         text = ""
@@ -66,15 +68,21 @@ def process_paper(pdf_path: str) -> dict:
             text = section_dict.get(key, "").strip()
             if text:
                 break
-        digest[dim] = text
+        if text:
+            digest[dim] = digest_summarizer.summarize(text, dimension=dim)
+        else:
+            digest[dim] = ""
 
     # 5. TF-IDF summary of full paper (fast — always run)
     tfidf = TFIDFSummarizer(num_sentences=5)
     tfidf_summary = tfidf.summarize(clean_text)
 
-    # 6. LED summary — deferred: compute if not already cached
-    # LED is expensive; run separately via run_led_summary()
-    led_summary = None
+    # 6. LED abstractive summary (runs allenai/led-large-16384-arxiv)
+    try:
+        led_summary = run_led_summary(clean_text)
+    except Exception as e:
+        # Preserve successful extraction, section detection, and TF-IDF if LED fails
+        led_summary = None
 
     return {
         "paper_id": paper_id,

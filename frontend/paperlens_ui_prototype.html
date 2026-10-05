@@ -218,6 +218,23 @@
         }
 
         /* Entrance choreography */
+        @keyframes wordmarkEntrance {
+            0% {
+                opacity: 0;
+                transform: translateY(14px) scale(0.96);
+                letter-spacing: 0.20em;
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                letter-spacing: 0.28em;
+            }
+        }
+        .landing-wordmark {
+            display: inline-block;
+            opacity: 0;
+            animation: wordmarkEntrance 800ms cubic-bezier(0.16, 1, 0.3, 1) 80ms forwards;
+        }
         .landing-eyebrow {
             opacity: 0;
             transform: translateY(12px);
@@ -241,6 +258,27 @@
         .landing-hint {
             opacity: 0;
             animation: landingReveal 600ms cubic-bezier(0.16, 1, 0.3, 1) 740ms forwards;
+        }
+
+        /* Independent landing header nav buttons hover transition */
+        .landing-nav-btn {
+            transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1),
+                        box-shadow 200ms ease,
+                        border-color 200ms ease,
+                        background-color 200ms ease,
+                        color 200ms ease;
+        }
+        .landing-nav-btn:hover {
+            transform: translateY(-1.5px);
+        }
+
+        /* Modal scale entrance */
+        @keyframes modalScaleIn {
+            0% { opacity: 0; transform: scale(0.96) translateY(8px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-animate-in {
+            animation: modalScaleIn 240ms cubic-bezier(0.16, 1, 0.3, 1) both;
         }
 
         @keyframes landingReveal {
@@ -307,6 +345,9 @@
 
         /* Reduced motion: disable all landing animations */
         @media (prefers-reduced-motion: reduce) {
+            .landing-wordmark,
+            .landing-nav-btn,
+            .modal-animate-in,
             .landing-eyebrow,
             .landing-headline,
             .landing-subtext,
@@ -314,6 +355,10 @@
             .landing-hint {
                 animation: none !important;
                 opacity: 1 !important;
+                transform: none !important;
+                letter-spacing: 0.28em !important;
+            }
+            .landing-nav-btn:hover {
                 transform: none !important;
             }
             #landing-dropzone,
@@ -329,23 +374,26 @@
             }
             #landing-flip-card { transition: none !important; }
             #landing-action-wrap { transition: none !important; }
+            .nav-dropdown-menu { transition: none !important; }
+            #compare-selection-bar { transition: none !important; }
+            .setup-card-animate { animation: none !important; }
         }
 
         /* 3D Flip Card Scene & Transitions */
         #landing-card-scene {
             perspective: 1400px;
-            min-height: 400px;
+            min-height: 330px;
         }
         #landing-flip-card {
             position: relative;
             transform-style: preserve-3d;
             transition: transform 620ms cubic-bezier(0.16, 1, 0.3, 1);
-            min-height: 400px;
+            min-height: 330px;
         }
         #landing-front {
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
-            min-height: 400px;
+            min-height: 330px;
             display: flex;
             flex-direction: column;
         }
@@ -356,7 +404,7 @@
             -webkit-backface-visibility: hidden;
             transform: rotateY(180deg);
             border-radius: 0.75rem;
-            min-height: 400px;
+            min-height: 330px;
             display: flex;
             flex-direction: column;
         }
@@ -376,6 +424,83 @@
             transform: translateY(0) scale(1);
             pointer-events: auto;
         }
+
+        /* Workspace nav coordinated dropdown menu */
+        .nav-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translate(-50%, 4px);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            z-index: 50;
+            padding-top: 6px;
+            transition: opacity 160ms cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 160ms cubic-bezier(0.16, 1, 0.3, 1),
+                        visibility 160ms ease;
+        }
+        .nav-dropdown-menu.is-open {
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: translate(-50%, 0) !important;
+            pointer-events: auto !important;
+        }
+        .nav-tab[aria-expanded="true"] .nav-chevron {
+            transform: rotate(180deg);
+        }
+        .nav-dropdown-card {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+        }
+        .dark .nav-dropdown-card {
+            box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.45), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Compare setup cards entrance */
+        @keyframes setupCardIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .setup-card-animate {
+            animation: setupCardIn 260ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+        }
+
+        /* Viewport-Fixed Multi-Paper Synthesis Selection Bar */
+        #compare-selection-bar {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translate(-50%, 140%);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 45;
+            width: 100%;
+            max-width: 48rem;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1),
+                        opacity 240ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #compare-selection-bar.is-visible {
+            transform: translate(-50%, 0) !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
+        }
+
+        /* Utility: Hide horizontal scrollbars */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
 </head>
 <body class="h-full bg-[#fbfbf9] dark:bg-[#0c0e12] text-[#121316] dark:text-[#f1f3f7] font-sans antialiased overflow-hidden flex flex-col">
@@ -391,38 +516,40 @@
         <!-- Animated Editorial Background Canvas -->
         <canvas id="landing-canvas" aria-hidden="true"></canvas>
 
-        <!-- Minimal Landing Header -->
-        <div id="landing-header" class="h-14 px-6 flex items-center justify-between border-b border-[#e5e5de]/60 dark:border-[#242934]/60 bg-[#fbfbf9]/90 dark:bg-[#0c0e12]/90 backdrop-blur-sm">
+        <!-- Landing Header (Brand on left, Independent Library / Evaluation / Theme controls on right) -->
+        <div id="landing-header" class="h-16 px-6 sm:px-8 flex items-center justify-between border-b border-[#e5e5de]/40 dark:border-[#242934]/40 bg-transparent relative z-20">
             <!-- Brand -->
             <div class="flex items-center gap-2.5">
-                <div class="w-6 h-6 rounded-md bg-[#1e3a8a] dark:bg-[#3b82f6] text-white flex items-center justify-center shadow-sm">
-                    <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+                <div class="w-7 h-7 rounded-lg bg-[#1e3a8a] dark:bg-[#3b82f6] text-white flex items-center justify-center shadow-xs">
+                    <i data-lucide="book-open" class="w-4 h-4"></i>
                 </div>
                 <span class="font-serif font-bold text-base tracking-tight text-[#121316] dark:text-[#f1f3f7]">PaperLens</span>
             </div>
 
-            <!-- Navigation links — subdued on landing -->
-            <nav class="hidden sm:flex items-center gap-0.5 text-xs font-medium">
-                <button onclick="exitLandingTo('library')" class="px-3 py-1.5 rounded-md text-[#787f91] dark:text-[#646e82] hover:text-[#121316] dark:hover:text-[#f1f3f7] hover:bg-[#f3f3ee] dark:hover:bg-[#1a1e26] transition-all">Library</button>
-                <button onclick="exitLandingTo('analysis')" class="px-3 py-1.5 rounded-md text-[#787f91] dark:text-[#646e82] hover:text-[#121316] dark:hover:text-[#f1f3f7] hover:bg-[#f3f3ee] dark:hover:bg-[#1a1e26] transition-all">Analyze</button>
-                <button onclick="exitLandingTo('compare')" class="px-3 py-1.5 rounded-md text-[#787f91] dark:text-[#646e82] hover:text-[#121316] dark:hover:text-[#f1f3f7] hover:bg-[#f3f3ee] dark:hover:bg-[#1a1e26] transition-all">Compare</button>
-                <button onclick="exitLandingTo('evaluation')" class="px-3 py-1.5 rounded-md text-[#787f91] dark:text-[#646e82] hover:text-[#121316] dark:hover:text-[#f1f3f7] hover:bg-[#f3f3ee] dark:hover:bg-[#1a1e26] transition-all">Evaluation</button>
-            </nav>
-
-            <!-- Theme toggle -->
-            <button onclick="toggleTheme()" class="p-1.5 rounded-md border border-[#e5e5de] dark:border-[#242934] text-[#4b5262] dark:text-[#949daf] hover:bg-[#f3f3ee] dark:hover:bg-[#1a1e26] transition-colors" title="Toggle theme" aria-label="Toggle theme">
-                <i data-lucide="moon" id="landing-theme-icon" class="w-4 h-4"></i>
-            </button>
+            <!-- Upper-right independent controls: Library -> Evaluation -> Theme Toggle -->
+            <div class="flex items-center gap-2.5 sm:gap-3">
+                <button onclick="navigateTo('library')" class="landing-nav-btn px-3.5 py-1.5 rounded-lg border border-[#e5e5de] dark:border-[#242934] bg-white/85 dark:bg-[#14171d]/85 text-xs font-medium text-[#4b5262] dark:text-[#949daf] hover:text-[#121316] dark:hover:text-[#f1f3f7] hover:border-[#d2d2cc] dark:hover:border-[#373e4d] hover:bg-white dark:hover:bg-[#1a1e26] transition-all duration-200 cursor-pointer shadow-2xs hover:shadow-xs" title="Open Library">
+                    Library
+                </button>
+                <button onclick="navigateTo('evaluation')" class="landing-nav-btn px-3.5 py-1.5 rounded-lg border border-[#e5e5de] dark:border-[#242934] bg-white/85 dark:bg-[#14171d]/85 text-xs font-medium text-[#4b5262] dark:text-[#949daf] hover:text-[#121316] dark:hover:text-[#f1f3f7] hover:border-[#d2d2cc] dark:hover:border-[#373e4d] hover:bg-white dark:hover:bg-[#1a1e26] transition-all duration-200 cursor-pointer shadow-2xs hover:shadow-xs" title="Open Evaluation Workspace">
+                    Evaluation
+                </button>
+                <button onclick="toggleTheme()" class="landing-nav-btn p-1.5 px-2.5 rounded-lg border border-[#e5e5de] dark:border-[#242934] bg-white/85 dark:bg-[#14171d]/85 text-[#4b5262] dark:text-[#949daf] hover:text-[#121316] dark:hover:text-[#f1f3f7] hover:border-[#d2d2cc] dark:hover:border-[#373e4d] hover:bg-white dark:hover:bg-[#1a1e26] transition-all duration-200 cursor-pointer shadow-2xs hover:shadow-xs" title="Toggle Light and Dark Mode" aria-label="Toggle theme">
+                    <i data-lucide="moon" id="landing-theme-icon" class="w-4 h-4"></i>
+                </button>
+            </div>
         </div>
 
         <!-- Landing Body: Centered editorial layout -->
         <div id="landing-body">
             <!-- Text composition — fades up when processing starts -->
-            <div id="landing-text-block" class="text-center space-y-4 mb-10 max-w-2xl mx-auto">
-                <!-- Eyebrow -->
-                <p class="landing-eyebrow font-mono text-[11px] uppercase tracking-widest text-[#1e3a8a] dark:text-[#3b82f6] font-semibold">
-                    PAPERLENS
-                </p>
+            <div id="landing-text-block" class="text-center space-y-3.5 mb-8 max-w-2xl mx-auto">
+                <!-- Editorial Wordmark Identity -->
+                <div class="landing-wordmark-wrap mb-1">
+                    <span class="landing-wordmark font-serif font-bold text-base sm:text-lg tracking-[0.28em] text-[#1e3a8a] dark:text-[#60a5fa] uppercase select-none">
+                        PAPERLENS
+                    </span>
+                </div>
                 <!-- Primary Headline -->
                 <h1 class="landing-headline font-serif font-semibold text-[#121316] dark:text-[#f1f3f7] leading-[1.1] tracking-tight"
                     style="font-size: clamp(2.4rem, 5vw, 4rem);">
@@ -454,28 +581,37 @@
                             tabindex="0"
                             aria-label="Upload research papers"
                             onkeydown="if(event.key==='Enter'||event.key===' ')landingDropzoneClick(event)"
-                            class="relative rounded-xl border border-[#d2d2cc] dark:border-[#373e4d] bg-white dark:bg-[#14171d] text-center select-none flex flex-col justify-center"
-                            style="box-shadow: 0 4px 24px rgba(0,0,0,0.06), 0 1px 6px rgba(0,0,0,0.04); min-height: 400px; padding: 2.5rem 3rem;"
+                            class="relative rounded-2xl border border-[#d2d2cc] dark:border-[#373e4d] bg-white dark:bg-[#14171d] text-center select-none flex flex-col justify-center"
+                            style="box-shadow: 0 4px 24px rgba(0,0,0,0.06), 0 1px 6px rgba(0,0,0,0.04); min-height: 330px; padding: 2.25rem 2.5rem;"
                         >
                             <!-- Upload Icon — gently floating in idle state -->
-                            <div id="landing-upload-icon-wrap" class="gentle-float mb-5 flex justify-center">
-                                <div class="w-14 h-14 rounded-2xl bg-[#eff4fe] dark:bg-[#172554] text-[#1e3a8a] dark:text-[#3b82f6] flex items-center justify-center shadow-sm">
-                                    <i data-lucide="upload-cloud" class="w-7 h-7"></i>
+                            <div id="landing-upload-icon-wrap" class="gentle-float mb-4 flex justify-center">
+                                <div class="w-13 h-13 rounded-2xl border border-[#1e3a8a]/15 dark:border-[#3b82f6]/25 bg-[#eff4fe] dark:bg-[#172554] text-[#1e3a8a] dark:text-[#3b82f6] flex items-center justify-center shadow-xs">
+                                    <i data-lucide="upload-cloud" class="w-6 h-6"></i>
                                 </div>
                             </div>
 
                             <!-- Empty state -->
-                            <div id="landing-dz-empty">
-                                <p class="font-serif text-lg font-semibold text-[#121316] dark:text-[#f1f3f7] mb-1.5 leading-snug">
-                                    Drop your research paper here
+                            <div id="landing-dz-empty" class="space-y-3">
+                                <div>
+                                    <p class="font-serif text-xl sm:text-2xl font-semibold text-[#121316] dark:text-[#f1f3f7] tracking-tight leading-snug">
+                                        Drop your research paper here
+                                    </p>
+                                    <p class="text-sm text-[#4b5262] dark:text-[#949daf] mt-1">
+                                        or <span class="text-[#1e3a8a] dark:text-[#3b82f6] font-medium underline underline-offset-4 decoration-[#1e3a8a]/40 hover:decoration-[#1e3a8a] cursor-pointer">choose a PDF</span> from your computer
+                                    </p>
+                                </div>
+
+                                <p class="text-xs text-[#787f91] dark:text-[#646e82] max-w-sm mx-auto leading-relaxed pt-1">
+                                    Published research PDFs and arXiv preprints
                                 </p>
-                                <p class="text-sm text-[#787f91] dark:text-[#646e82] mb-5">
-                                    or <span class="text-[#1e3a8a] dark:text-[#3b82f6] font-medium underline underline-offset-2 decoration-[#1e3a8a]/30">choose a PDF</span>
-                                </p>
-                                <div class="inline-flex items-center gap-2 text-[11px] font-mono text-[#787f91] dark:text-[#646e82] border border-[#e5e5de] dark:border-[#242934] rounded-full px-3 py-1 bg-[#f3f3ee] dark:bg-[#1a1e26]">
-                                    <span>PDF</span>
-                                    <span class="w-px h-3 bg-[#d2d2cc] dark:bg-[#373e4d]"></span>
-                                    <span>1–5 papers</span>
+
+                                <div class="pt-2">
+                                    <div class="inline-flex items-center gap-2 text-[11px] font-mono text-[#787f91] dark:text-[#949daf] border border-[#e5e5de] dark:border-[#242934] rounded-full px-3.5 py-1 bg-[#fbfbf9] dark:bg-[#101217]">
+                                        <span>PDF</span>
+                                        <span class="w-1 h-1 rounded-full bg-[#d2d2cc] dark:bg-[#373e4d]"></span>
+                                        <span>1–5 papers</span>
+                                    </div>
                                 </div>
                             </div>
 
@@ -576,8 +712,13 @@
 
                             <!-- Error banner inside processing panel -->
                             <div id="landing-processing-error" class="hidden mt-3 border border-[#991b1b]/30 bg-[#fef2f2] dark:bg-[#7f1d1d]/20 text-[#991b1b] dark:text-[#f87171] p-3 rounded-lg text-xs">
-                                <p class="font-medium mb-1">Processing failed</p>
-                                <p id="landing-processing-error-text" class="opacity-90"></p>
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="font-medium">Processing failed</p>
+                                    <button type="button" onclick="dismissLandingProcessingError()" class="p-0.5 rounded hover:opacity-70 text-current cursor-pointer shrink-0" title="Dismiss error" aria-label="Dismiss error">
+                                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </div>
+                                <p id="landing-processing-error-text" class="opacity-90 mt-1"></p>
                                 <button onclick="landingResetToUpload()" class="mt-2 underline font-medium hover:no-underline">Try again</button>
                             </div>
                         </div>
@@ -626,12 +767,62 @@
             <button onclick="navigateTo('library')" data-nav="library" class="nav-tab px-3.5 py-1 rounded text-xs font-medium transition-all text-[#121316] dark:text-[#f1f3f7] bg-white dark:bg-[#20242e] shadow-sm">
                 Library <span id="nav-count-badge" class="font-mono text-[11px] ml-1 text-[#787f91] dark:text-[#646e82]">(0)</span>
             </button>
-            <button onclick="navigateTo('analysis')" data-nav="analysis" class="nav-tab px-3.5 py-1 rounded text-xs font-medium transition-all text-[#4b5262] dark:text-[#949daf] hover:text-[#121316] dark:hover:text-[#f1f3f7]">
-                Analyze
-            </button>
-            <button onclick="navigateTo('compare')" data-nav="compare" class="nav-tab px-3.5 py-1 rounded text-xs font-medium transition-all text-[#4b5262] dark:text-[#949daf] hover:text-[#121316] dark:hover:text-[#f1f3f7]">
-                Compare <span id="nav-compare-count" class="font-mono text-[11px] ml-1 px-1.5 py-0.2 rounded bg-[#eff4fe] dark:bg-[#172554] text-[#1e3a8a] dark:text-[#3b82f6] hidden"></span>
-            </button>
+
+            <!-- Analyze Nav with Floating Workspace Dropdown -->
+            <div class="relative" id="nav-wrapper-analysis">
+                <button id="nav-analysis-btn" onclick="navGoRecentAnalysis()" data-nav="analysis" class="nav-tab px-3.5 py-1 rounded text-xs font-medium transition-all text-[#4b5262] dark:text-[#949daf] hover:text-[#121316] dark:hover:text-[#f1f3f7] flex items-center gap-1" aria-haspopup="true" aria-expanded="false">
+                    <span>Analyze</span>
+                    <i data-lucide="chevron-down" class="nav-chevron w-3 h-3 opacity-60 transition-transform duration-200"></i>
+                </button>
+                <div id="nav-analysis-dropdown" class="nav-dropdown-menu">
+                    <div class="nav-dropdown-card w-52 p-1.5 rounded-xl border border-[#e5e5de] dark:border-[#242934] bg-white dark:bg-[#14171d]">
+                        <button onclick="navGoRecentAnalysis()" class="w-full text-left px-3 py-2 rounded-lg text-xs hover:bg-[#f3f3ee] dark:hover:bg-[#1a1e26] transition-colors flex items-center gap-2.5 text-[#121316] dark:text-[#f1f3f7]">
+                            <i data-lucide="file-text" class="w-3.5 h-3.5 text-[#1e3a8a] dark:text-[#3b82f6] shrink-0"></i>
+                            <div class="flex-1 min-w-0">
+                                <div class="font-medium leading-none">Recent Analysis</div>
+                                <div class="text-[10px] text-[#787f91] dark:text-[#646e82] truncate font-serif italic mt-0.5" id="nav-recent-analysis-name">Resume active paper</div>
+                            </div>
+                        </button>
+                        <div class="h-px bg-[#e5e5de]/60 dark:bg-[#242934]/60 my-1"></div>
+                        <button onclick="navGoNewAnalysis()" class="w-full text-left px-3 py-2 rounded-lg text-xs hover:bg-[#eff4fe] dark:hover:bg-[#172554]/50 text-[#1e3a8a] dark:text-[#3b82f6] transition-colors flex items-center gap-2.5 font-medium">
+                            <i data-lucide="upload" class="w-3.5 h-3.5 shrink-0"></i>
+                            <div class="flex-1 min-w-0">
+                                <div class="leading-none">New Analysis</div>
+                                <div class="text-[10px] text-[#1e3a8a]/70 dark:text-[#3b82f6]/70 truncate mt-0.5">Upload a new manuscript</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compare Nav with Floating Workspace Dropdown -->
+            <div class="relative" id="nav-wrapper-compare">
+                <button id="nav-compare-btn" onclick="navGoRecentCompare()" data-nav="compare" class="nav-tab px-3.5 py-1 rounded text-xs font-medium transition-all text-[#4b5262] dark:text-[#949daf] hover:text-[#121316] dark:hover:text-[#f1f3f7] flex items-center gap-1" aria-haspopup="true" aria-expanded="false">
+                    <span>Compare</span>
+                    <span id="nav-compare-count" class="font-mono text-[10px] px-1 py-0.2 rounded bg-[#eff4fe] dark:bg-[#172554] text-[#1e3a8a] dark:text-[#3b82f6] hidden"></span>
+                    <i data-lucide="chevron-down" class="nav-chevron w-3 h-3 opacity-60 transition-transform duration-200"></i>
+                </button>
+                <div id="nav-compare-dropdown" class="nav-dropdown-menu">
+                    <div class="nav-dropdown-card w-52 p-1.5 rounded-xl border border-[#e5e5de] dark:border-[#242934] bg-white dark:bg-[#14171d]">
+                        <button onclick="navGoRecentCompare()" class="w-full text-left px-3 py-2 rounded-lg text-xs hover:bg-[#f3f3ee] dark:hover:bg-[#1a1e26] transition-colors flex items-center gap-2.5 text-[#121316] dark:text-[#f1f3f7]">
+                            <i data-lucide="git-compare" class="w-3.5 h-3.5 text-[#1e3a8a] dark:text-[#3b82f6] shrink-0"></i>
+                            <div class="flex-1 min-w-0">
+                                <div class="font-medium leading-none">Recent Comparison</div>
+                                <div class="text-[10px] text-[#787f91] dark:text-[#646e82] truncate font-mono mt-0.5" id="nav-recent-compare-desc">Active synthesis</div>
+                            </div>
+                        </button>
+                        <div class="h-px bg-[#e5e5de]/60 dark:bg-[#242934]/60 my-1"></div>
+                        <button onclick="navGoNewCompare()" class="w-full text-left px-3 py-2 rounded-lg text-xs hover:bg-[#eff4fe] dark:hover:bg-[#172554]/50 text-[#1e3a8a] dark:text-[#3b82f6] transition-colors flex items-center gap-2.5 font-medium">
+                            <i data-lucide="plus" class="w-3.5 h-3.5 shrink-0"></i>
+                            <div class="flex-1 min-w-0">
+                                <div class="leading-none">New Comparison</div>
+                                <div class="text-[10px] text-[#1e3a8a]/70 dark:text-[#3b82f6]/70 truncate mt-0.5">Start fresh compare setup</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <button onclick="navigateTo('evaluation')" data-nav="evaluation" class="nav-tab px-3.5 py-1 rounded text-xs font-medium transition-all text-[#4b5262] dark:text-[#949daf] hover:text-[#121316] dark:hover:text-[#f1f3f7]">
                 Evaluation
             </button>
@@ -641,10 +832,10 @@
         <div class="flex items-center gap-3">
             <div id="active-paper-indicator" class="hidden text-xs text-[#787f91] dark:text-[#646e82] max-w-[200px] truncate border-r border-[#e5e5de] dark:border-[#242934] pr-3 font-serif italic" title="Active Manuscript"></div>
             
-            <!-- Quick Ingest CTA Button -->
-            <button onclick="navigateTo('landing')" class="px-3 py-1.5 rounded-md bg-[#1e3a8a] dark:bg-[#3b82f6] text-white text-xs font-medium hover:bg-[#172554] dark:hover:bg-[#2563eb] transition-all flex items-center gap-1.5 active:scale-[0.98]">
-                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                <span class="hidden sm:inline">Ingest</span>
+            <!-- Global New Analysis CTA Button -->
+            <button id="global-new-analysis-btn" onclick="navGoNewAnalysis()" class="px-3.5 py-1.5 rounded-md bg-[#1e3a8a] dark:bg-[#3b82f6] text-white text-xs font-medium hover:bg-[#172554] dark:hover:bg-[#2563eb] transition-all flex items-center gap-1.5 active:scale-[0.98] shadow-sm" title="Upload and analyze a new manuscript">
+                <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                <span class="hidden sm:inline">New Analysis</span>
             </button>
 
             <!-- Theme Toggle -->
@@ -675,12 +866,9 @@
                         <i data-lucide="search" class="w-3.5 h-3.5 text-[#787f91] absolute left-3 top-1/2 -translate-y-1/2"></i>
                         <input type="text" id="library-search-input" oninput="filterLibraryTable(this.value)" placeholder="Search manuscripts..." class="pl-8 pr-3 py-1.5 text-xs rounded-md border border-[#e5e5de] dark:border-[#242934] bg-white dark:bg-[#14171d] text-[#121316] dark:text-[#f1f3f7] focus:outline-none focus:border-[#1e3a8a] dark:focus:border-[#3b82f6] transition-all w-48 lg:w-64">
                     </div>
-                    <button onclick="navigateTo('landing')" class="px-3.5 py-1.5 rounded-md bg-[#1e3a8a] dark:bg-[#3b82f6] text-white text-xs font-medium hover:bg-[#172554] dark:hover:bg-[#2563eb] transition-all flex items-center gap-1.5 active:scale-[0.98]">
-                        <i data-lucide="upload" class="w-3.5 h-3.5"></i>
-                        <span>Ingest Paper</span>
-                    </button>
                 </div>
             </div>
+
 
             <!-- Empty State -->
             <div id="library-empty-state" class="hidden py-20 text-center space-y-4 border border-[#e5e5de] dark:border-[#242934] rounded-lg bg-white dark:bg-[#14171d] shadow-sm">
@@ -693,8 +881,9 @@
                         Ingest standard PDF research papers to generate executive research briefs, canonical digests, and transformer summaries.
                     </p>
                 </div>
-                <button onclick="navigateTo('landing')" class="px-4 py-2 rounded-md bg-[#1e3a8a] dark:bg-[#3b82f6] text-white text-xs font-medium hover:bg-[#172554] dark:hover:bg-[#2563eb] transition-all">
-                    Ingest First Manuscript
+                <button onclick="navGoNewAnalysis()" class="px-4 py-2 rounded-md bg-[#1e3a8a] dark:bg-[#3b82f6] text-white text-xs font-medium hover:bg-[#172554] dark:hover:bg-[#2563eb] transition-all inline-flex items-center gap-1.5 cursor-pointer">
+                    <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                    <span>New Analysis</span>
                 </button>
             </div>
 
@@ -717,22 +906,6 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
-
-            <!-- Floating Multi-Paper Synthesis Dock -->
-            <div id="compare-dock" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#121316] dark:bg-[#f1f3f7] text-white dark:text-[#121316] px-5 py-3 rounded-full shadow-xl flex items-center gap-4 transition-all duration-300 translate-y-24 opacity-0 pointer-events-none">
-                <div class="flex items-center gap-2 text-xs">
-                    <i data-lucide="git-compare" class="w-4 h-4 text-[#3b82f6] dark:text-[#1e3a8a]"></i>
-                    <span class="font-medium" id="compare-dock-count">0 manuscripts selected</span>
-                </div>
-                <div class="h-4 w-px bg-white/20 dark:bg-black/20"></div>
-                <button onclick="launchComparisonFromDock()" class="px-3.5 py-1 rounded-full bg-[#3b82f6] dark:bg-[#1e3a8a] text-white text-xs font-medium hover:bg-[#2563eb] dark:hover:bg-[#172554] transition-all flex items-center gap-1.5">
-                    <span>Synthesize Comparison</span>
-                    <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                </button>
-                <button onclick="clearComparisonSelection()" class="text-xs text-white/60 dark:text-black/60 hover:text-white dark:hover:text-black transition-colors">
-                    Clear
-                </button>
             </div>
         </section>
 
@@ -866,9 +1039,14 @@
 
             <!-- Error Banner -->
             <div id="ingestion-error-banner" class="hidden border border-[#991b1b]/30 bg-[#fef2f2] dark:bg-[#7f1d1d]/20 text-[#991b1b] dark:text-[#f87171] p-4 rounded-md text-xs space-y-2">
-                <div class="flex items-center gap-2 font-medium">
-                    <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
-                    <span>Ingestion failed</span>
+                <div class="flex items-center justify-between gap-2 font-medium">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
+                        <span>Ingestion failed</span>
+                    </div>
+                    <button type="button" onclick="dismissIngestionError()" class="p-0.5 rounded hover:opacity-70 text-current cursor-pointer shrink-0" title="Dismiss error" aria-label="Dismiss error">
+                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                    </button>
                 </div>
                 <p id="ingestion-error-text" class="text-xs opacity-90"></p>
                 <button onclick="dismissIngestionError()" class="underline hover:no-underline font-medium">Dismiss</button>
@@ -900,26 +1078,29 @@
             <div id="analysis-paper-content" class="hidden space-y-8">
                 <!-- Manuscript Hero Header -->
                 <div class="border-b border-[#e5e5de] dark:border-[#242934] pb-6 space-y-4">
-                    <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
-                        <div class="space-y-2 max-w-4xl">
-                            <div class="flex items-center gap-2">
-                                <span class="px-2 py-0.5 rounded bg-[#eff4fe] dark:bg-[#172554] text-[#1e3a8a] dark:text-[#3b82f6] text-[10px] font-mono uppercase tracking-wider font-semibold">Manuscript Analysis</span>
-                                <span class="text-xs font-mono text-[#787f91] dark:text-[#646e82]" id="analysis-paper-id"></span>
-                            </div>
-                            <h1 class="font-serif text-3xl lg:text-4xl font-bold tracking-tight text-[#121316] dark:text-[#f1f3f7] leading-tight" id="analysis-title"></h1>
+                    <!-- Eyebrow + Actions Row -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded bg-[#eff4fe] dark:bg-[#172554] text-[#1e3a8a] dark:text-[#3b82f6] text-[10px] font-mono uppercase tracking-wider font-semibold">Manuscript Analysis</span>
+                            <span class="text-xs font-mono text-[#787f91] dark:text-[#646e82]" id="analysis-paper-id"></span>
                         </div>
                         
-                        <!-- Header Action Controls -->
-                        <div class="flex items-center gap-3 shrink-0 self-start">
+                        <!-- Actions Dedicated Area -->
+                        <div class="flex items-center flex-wrap gap-2.5 shrink-0">
                             <button onclick="toggleCompareForCurrentPaper()" id="analysis-toggle-compare-btn" class="px-4 py-2 rounded-lg border border-[#1e3a8a]/40 dark:border-[#3b82f6]/40 bg-[#eff4fe] dark:bg-[#172554] text-[#1e3a8a] dark:text-[#3b82f6] hover:bg-[#1e3a8a] hover:text-white dark:hover:bg-[#3b82f6] dark:hover:text-white font-medium text-xs shadow-sm transition-all flex items-center gap-2 active:scale-[0.98] group">
-                                <i data-lucide="git-compare" class="w-4 h-4 transition-transform group-hover:scale-110"></i>
-                                <span id="analysis-compare-btn-text">Add to Compare</span>
+                                <i data-lucide="git-compare" id="analysis-compare-icon" class="w-4 h-4 transition-transform group-hover:scale-110"></i>
+                                <span id="analysis-compare-btn-text">+ Add to Compare</span>
                             </button>
-                            <button onclick="openCurrentPaperInEvaluation()" class="px-3.5 py-2 rounded-lg bg-[#f3f3ee] dark:bg-[#1a1e26] border border-[#e5e5de] dark:border-[#242934] text-xs font-medium text-[#1e3a8a] dark:text-[#3b82f6] hover:bg-[#eff4fe] dark:hover:bg-[#172554] transition-all flex items-center gap-1.5 active:scale-[0.98]">
+                            <button onclick="openCurrentPaperInEvaluation()" class="px-3.5 py-2 rounded-lg bg-[#f3f3ee] dark:bg-[#1a1e26] border border-[#e5e5de] dark:border-[#242934] text-xs font-medium text-[#787f91] dark:text-[#949daf] hover:text-[#121316] dark:hover:text-[#f1f3f7] hover:bg-white dark:hover:bg-[#20242e] transition-all flex items-center gap-1.5 active:scale-[0.98]">
                                 <i data-lucide="award" class="w-3.5 h-3.5"></i>
                                 <span>Benchmark in Evaluation →</span>
                             </button>
                         </div>
+                    </div>
+
+                    <!-- Full Primary Title Area (never overlaps with actions) -->
+                    <div class="w-full">
+                        <h1 class="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-[#121316] dark:text-[#f1f3f7] leading-tight break-words" id="analysis-title"></h1>
                     </div>
 
                     <!-- Meta Ribbon & View Mode Pivot Switcher -->
@@ -1175,99 +1356,117 @@
         <!-- SCREEN 4: COMPARE (RESEARCH SYNTHESIS TOOL) -->
         <!-- ================================================================= -->
         <section id="screen-compare" class="screen-view max-w-7xl mx-auto space-y-8 hidden">
-            <!-- Header -->
-            <div class="border-b border-[#e5e5de] dark:border-[#242934] pb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-                <div class="space-y-1.5 max-w-2xl">
-                    <span class="text-[11px] font-mono uppercase tracking-wider text-[#1e3a8a] dark:text-[#3b82f6] font-semibold">Comparative Intelligence</span>
-                    <h1 class="font-serif text-3xl lg:text-4xl font-bold tracking-tight text-[#121316] dark:text-[#f1f3f7]">Research Synthesis</h1>
-                    <p class="text-xs text-[#787f91] dark:text-[#646e82] leading-relaxed">
-                        Cross-document conceptual mapping separating common approaches, key differences, empirical findings, and open research gaps.
-                    </p>
-                </div>
-                <div class="flex items-center gap-2.5 shrink-0">
-                    <button onclick="navigateTo('library')" class="px-3.5 py-2 rounded-lg border border-[#e5e5de] dark:border-[#242934] bg-white dark:bg-[#14171d] text-xs font-medium text-[#121316] dark:text-[#f1f3f7] hover:bg-[#f3f3ee] dark:hover:bg-[#1a1e26] transition-all flex items-center gap-1.5 shadow-sm active:scale-[0.98]">
-                        <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5 text-[#787f91]"></i>
-                        <span>Adjust Selection</span>
-                    </button>
-                    <button onclick="navigateTo('landing')" class="px-3.5 py-2 rounded-lg bg-[#eff4fe] dark:bg-[#172554] border border-[#1e3a8a]/30 dark:border-[#3b82f6]/40 text-[#1e3a8a] dark:text-[#3b82f6] text-xs font-medium hover:bg-[#1e3a8a] hover:text-white dark:hover:bg-[#3b82f6] dark:hover:text-white transition-all flex items-center gap-1.5 shadow-sm active:scale-[0.98]">
-                        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                        <span>Ingest More</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Elevated Editorial Empty State (< 2 papers) -->
-            <div id="compare-empty-state" class="py-14 sm:py-20 text-center max-w-3xl mx-auto space-y-8">
-                <!-- Eyebrow & Headline -->
-                <div class="space-y-3">
-                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#1e3a8a]/20 dark:border-[#3b82f6]/30 bg-[#eff4fe]/50 dark:bg-[#172554]/30 text-[#1e3a8a] dark:text-[#3b82f6] font-mono text-[11px] font-semibold uppercase tracking-widest">
+            <!-- ========================================================= -->
+            <!-- SUB-VIEW 1: COMPARISON SETUP (Staged Manuscripts & Intake) -->
+            <!-- ========================================================= -->
+            <div id="compare-setup-view" class="max-w-4xl mx-auto space-y-8 py-2">
+                <!-- Setup Editorial Header -->
+                <div class="space-y-3 border-b border-[#e5e5de] dark:border-[#242934] pb-6">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#1e3a8a]/20 dark:border-[#3b82f6]/30 bg-[#eff4fe]/60 dark:bg-[#172554]/30 text-[#1e3a8a] dark:text-[#3b82f6] font-mono text-[11px] font-semibold uppercase tracking-widest">
                         <i data-lucide="git-compare" class="w-3.5 h-3.5"></i>
-                        Multi-Document Synthesis
+                        COMPARISON SETUP
                     </span>
-                    <h2 class="font-serif text-3xl sm:text-5xl font-bold tracking-tight text-[#121316] dark:text-[#f1f3f7] leading-tight">
-                        Bring two or more papers together.
-                    </h2>
-                    <p class="text-sm sm:text-base text-[#787f91] dark:text-[#646e82] max-w-lg mx-auto leading-relaxed">
-                        Compare methods, findings, approaches, and research gaps across your corpus into a unified conceptual framework.
+                    <h1 id="compare-setup-heading" class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#121316] dark:text-[#f1f3f7] leading-tight">
+                        Ready to compare.
+                    </h1>
+                    <p id="compare-setup-subtext" class="text-sm text-[#787f91] dark:text-[#646e82] max-w-xl leading-relaxed">
+                        Choose the papers you want PaperLens to synthesize. You can add or remove manuscripts before running the comparison.
                     </p>
                 </div>
 
-                <!-- 4 Pillars Preview Grid -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
-                    <div class="p-4 rounded-xl border border-[#e5e5de] dark:border-[#242934] bg-white dark:bg-[#14171d] space-y-2 shadow-sm transition-all hover:border-[#065f46]/40">
-                        <div class="w-7 h-7 rounded-lg bg-[#ecfdf5] dark:bg-[#064e3b]/30 text-[#065f46] dark:text-[#34d399] flex items-center justify-center">
-                            <i data-lucide="layers" class="w-3.5 h-3.5"></i>
-                        </div>
-                        <p class="font-serif font-semibold text-xs text-[#121316] dark:text-[#f1f3f7]">1. Shared Foundations</p>
-                        <p class="text-[11px] text-[#787f91] dark:text-[#646e82] leading-snug">Common architectures, tasks & methodological paradigms</p>
+                <!-- Queued Papers Container -->
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="font-mono text-[#787f91] dark:text-[#646e82] uppercase tracking-wider font-semibold" id="compare-setup-count-label">
+                            Selected Manuscripts (0 of 5)
+                        </span>
+                        <span class="text-[11px] font-mono text-[#787f91]">2 to 5 papers required for synthesis</span>
                     </div>
-                    <div class="p-4 rounded-xl border border-[#e5e5de] dark:border-[#242934] bg-white dark:bg-[#14171d] space-y-2 shadow-sm transition-all hover:border-[#991b1b]/40">
-                        <div class="w-7 h-7 rounded-lg bg-[#fef2f2] dark:bg-[#7f1d1d]/30 text-[#991b1b] dark:text-[#f87171] flex items-center justify-center">
-                            <i data-lucide="git-branch" class="w-3.5 h-3.5"></i>
+
+                    <!-- Staggered paper cards -->
+                    <div id="compare-setup-cards-list" class="space-y-3"></div>
+
+                    <!-- Empty placeholder card (shown when 0 papers queued) -->
+                    <div id="compare-setup-empty-card" class="hidden p-10 rounded-2xl border border-dashed border-[#d2d2cc] dark:border-[#373e4d] text-center space-y-2 bg-[#fbfbf9]/60 dark:bg-[#111317]/60">
+                        <div class="w-10 h-10 rounded-full bg-[#f3f3ee] dark:bg-[#1a1e26] text-[#787f91] flex items-center justify-center mx-auto mb-2">
+                            <i data-lucide="layers" class="w-5 h-5"></i>
                         </div>
-                        <p class="font-serif font-semibold text-xs text-[#121316] dark:text-[#f1f3f7]">2. Key Divergences</p>
-                        <p class="text-[11px] text-[#787f91] dark:text-[#646e82] leading-snug">Contrasting model mechanisms & dataset scopes</p>
+                        <p class="font-serif text-base font-semibold text-[#121316] dark:text-[#f1f3f7]">No manuscripts queued for comparison</p>
+                        <p class="text-xs text-[#787f91] dark:text-[#646e82] max-w-md mx-auto">Select papers from your library or analyze a new manuscript to begin multi-document synthesis.</p>
                     </div>
-                    <div class="p-4 rounded-xl border border-[#e5e5de] dark:border-[#242934] bg-white dark:bg-[#14171d] space-y-2 shadow-sm transition-all hover:border-[#1e3a8a]/40">
-                        <div class="w-7 h-7 rounded-lg bg-[#eff4fe] dark:bg-[#172554] text-[#1e3a8a] dark:text-[#3b82f6] flex items-center justify-center">
-                            <i data-lucide="bar-chart-2" class="w-3.5 h-3.5"></i>
-                        </div>
-                        <p class="font-serif font-semibold text-xs text-[#121316] dark:text-[#f1f3f7]">3. Empirical Findings</p>
-                        <p class="text-[11px] text-[#787f91] dark:text-[#646e82] leading-snug">Benchmarked discoveries & comparative evidence</p>
-                    </div>
-                    <div class="p-4 rounded-xl border border-[#e5e5de] dark:border-[#242934] bg-white dark:bg-[#14171d] space-y-2 shadow-sm transition-all hover:border-[#6b21a8]/40">
-                        <div class="w-7 h-7 rounded-lg bg-[#faf5ff] dark:bg-[#581c87]/30 text-[#6b21a8] dark:text-[#c084fc] flex items-center justify-center">
-                            <i data-lucide="compass" class="w-3.5 h-3.5"></i>
-                        </div>
-                        <p class="font-serif font-semibold text-xs text-[#121316] dark:text-[#f1f3f7]">4. Research Gaps</p>
-                        <p class="text-[11px] text-[#787f91] dark:text-[#646e82] leading-snug">Unaddressed challenges & boundary conditions</p>
+
+                    <!-- Intake & Selection Action Buttons -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                        <button onclick="compareSetupAddFromLibrary()" class="p-4 rounded-xl border border-[#e5e5de] dark:border-[#242934] bg-white dark:bg-[#14171d] hover:border-[#1e3a8a] dark:hover:border-[#3b82f6] hover:bg-[#eff4fe]/30 dark:hover:bg-[#172554]/20 transition-all text-left flex items-center justify-between group shadow-sm">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-lg bg-[#eff4fe] dark:bg-[#172554] text-[#1e3a8a] dark:text-[#3b82f6] flex items-center justify-center shrink-0">
+                                    <i data-lucide="book-open" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-semibold text-[#121316] dark:text-[#f1f3f7]">+ Add from Library</div>
+                                    <div class="text-[11px] text-[#787f91] dark:text-[#646e82]">Select from already ingested papers</div>
+                                </div>
+                            </div>
+                            <i data-lucide="arrow-right" class="w-4 h-4 text-[#787f91] transition-transform group-hover:translate-x-1"></i>
+                        </button>
+
+                        <button onclick="compareSetupAnalyzeNewPaper()" class="p-4 rounded-xl border border-[#e5e5de] dark:border-[#242934] bg-white dark:bg-[#14171d] hover:border-[#1e3a8a] dark:hover:border-[#3b82f6] hover:bg-[#eff4fe]/30 dark:hover:bg-[#172554]/20 transition-all text-left flex items-center justify-between group shadow-sm">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-lg bg-[#eff4fe] dark:bg-[#172554] text-[#1e3a8a] dark:text-[#3b82f6] flex items-center justify-center shrink-0">
+                                    <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-semibold text-[#121316] dark:text-[#f1f3f7]">+ Analyze a New Paper</div>
+                                    <div class="text-[11px] text-[#787f91] dark:text-[#646e82]">Upload a manuscript via cinematic intake</div>
+                                </div>
+                            </div>
+                            <i data-lucide="arrow-right" class="w-4 h-4 text-[#787f91] transition-transform group-hover:translate-x-1"></i>
+                        </button>
                     </div>
                 </div>
 
-                <!-- Integrated Actions -->
-                <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
-                    <button onclick="navigateTo('library')" class="px-5 py-2.5 rounded-xl bg-[#1e3a8a] dark:bg-[#3b82f6] text-white text-xs font-medium hover:bg-[#172554] dark:hover:bg-[#2563eb] transition-all flex items-center gap-2 shadow-sm active:scale-[0.98]">
-                        <i data-lucide="book-open" class="w-4 h-4"></i>
-                        <span>Select Papers from Library</span>
-                    </button>
-                    <button onclick="navigateTo('landing')" class="px-4 py-2.5 rounded-xl border border-[#e5e5de] dark:border-[#242934] bg-white dark:bg-[#14171d] text-xs font-medium text-[#4b5262] dark:text-[#949daf] hover:bg-[#f3f3ee] dark:hover:bg-[#1a1e26] transition-all flex items-center gap-2 active:scale-[0.98]">
-                        <i data-lucide="plus" class="w-4 h-4"></i>
-                        <span>Ingest New Papers</span>
+                <!-- Primary CTA: Compare Papers -->
+                <div class="pt-6 border-t border-[#e5e5de] dark:border-[#242934] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="text-xs text-[#787f91] dark:text-[#646e82] font-mono" id="compare-setup-cta-status">
+                        Requires at least 2 papers to synthesize
+                    </div>
+                    <button id="compare-setup-run-btn" onclick="executeComparisonSynthesis()" disabled class="px-8 py-3.5 rounded-xl font-medium text-sm text-white bg-[#1e3a8a] dark:bg-[#3b82f6] hover:bg-[#172554] dark:hover:bg-[#2563eb] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 shadow-md disabled:opacity-40 disabled:pointer-events-none">
+                        <i data-lucide="git-compare" class="w-4 h-4"></i>
+                        <span id="compare-setup-run-label">Compare Papers →</span>
                     </button>
                 </div>
             </div>
 
-            <!-- Active Comparison View -->
-            <div id="compare-active-view" class="hidden space-y-8">
+            <!-- ========================================================= -->
+            <!-- SUB-VIEW 2: RESEARCH SYNTHESIS RESULTS                    -->
+            <!-- ========================================================= -->
+            <div id="compare-results-view" class="hidden space-y-8">
+                <!-- Header -->
+                <div class="border-b border-[#e5e5de] dark:border-[#242934] pb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                    <div class="space-y-1.5 max-w-2xl">
+                        <span class="text-[11px] font-mono uppercase tracking-wider text-[#1e3a8a] dark:text-[#3b82f6] font-semibold">Comparative Intelligence</span>
+                        <h1 class="font-serif text-3xl lg:text-4xl font-bold tracking-tight text-[#121316] dark:text-[#f1f3f7]">Research Synthesis</h1>
+                        <p class="text-xs text-[#787f91] dark:text-[#646e82] leading-relaxed">
+                            Cross-document conceptual mapping separating common approaches, key differences, empirical findings, and open research gaps.
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-2.5 shrink-0">
+                        <button onclick="openCompareSetup()" class="px-3.5 py-2 rounded-lg border border-[#e5e5de] dark:border-[#242934] bg-white dark:bg-[#14171d] text-xs font-medium text-[#121316] dark:text-[#f1f3f7] hover:bg-[#f3f3ee] dark:hover:bg-[#1a1e26] transition-all flex items-center gap-1.5 shadow-sm active:scale-[0.98]">
+                            <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5 text-[#787f91]"></i>
+                            <span>Adjust Setup</span>
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Selected Papers Ribbon -->
                 <div class="border border-[#e5e5de] dark:border-[#242934] rounded-xl p-4 bg-white dark:bg-[#14171d] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div class="flex items-center gap-2">
-                        <span class="text-[11px] font-mono text-[#787f91] uppercase tracking-wider font-semibold shrink-0">Synthesized Corpus:</span>
-                        <div class="flex items-center gap-2 overflow-x-auto pb-0.5" id="compare-selected-chips">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <span class="text-[11px] font-mono text-[#787f91] uppercase tracking-wider font-semibold shrink-0">SYNTHESIZED CORPUS:</span>
+                        <div class="flex items-center gap-2 overflow-x-auto pb-0.5 no-scrollbar" id="compare-selected-chips">
                             <!-- Populated dynamically -->
                         </div>
                     </div>
-                    <button onclick="navigateTo('library')" class="text-xs text-[#1e3a8a] dark:text-[#3b82f6] font-medium hover:underline shrink-0 flex items-center gap-1">
+                    <button onclick="compareSetupAddFromLibrary()" class="text-xs text-[#1e3a8a] dark:text-[#3b82f6] font-medium hover:underline shrink-0 flex items-center gap-1">
                         <span>+ Add another manuscript</span>
                     </button>
                 </div>
@@ -1566,6 +1765,180 @@
 
     </main>
 
+    <!-- Floating Multi-Paper Synthesis Selection Bar (Anchored to true viewport) -->
+    <div id="compare-selection-bar">
+        <div class="pointer-events-auto bg-white/95 dark:bg-[#14171d]/95 backdrop-blur-md text-[#121316] dark:text-[#f1f3f7] border border-[#e5e5de] dark:border-[#242934] rounded-2xl p-3.5 shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex-1 min-w-0 space-y-1.5">
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#1e3a8a] dark:bg-[#3b82f6]"></span>
+                    <span id="selection-bar-label" class="font-mono text-[10px] uppercase tracking-wider font-semibold text-[#1e3a8a] dark:text-[#3b82f6]">
+                        SELECTED FOR COMPARISON · 0 PAPERS
+                    </span>
+                    <span class="text-[10px] font-mono text-[#787f91] dark:text-[#646e82]">(max 5)</span>
+                </div>
+                <div id="selection-bar-chips" class="flex items-center gap-1.5 overflow-x-auto py-0.5 no-scrollbar"></div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                <button type="button" onclick="clearComparisonSelection()" class="px-2.5 py-1.5 rounded-lg text-xs font-mono text-[#787f91] dark:text-[#646e82] hover:text-[#991b1b] dark:hover:text-[#f87171] hover:bg-[#f3f3ee] dark:hover:bg-[#1a1e26] transition-colors cursor-pointer">
+                    Clear
+                </button>
+                <button id="selection-bar-continue-btn" onclick="continueToCompareSetup()" disabled class="px-4 py-2 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 shadow-sm bg-[#1e3a8a] dark:bg-[#3b82f6] text-white hover:bg-[#172554] dark:hover:bg-[#2563eb] active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none cursor-pointer">
+                    <span id="selection-bar-continue-text">Continue to Compare →</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- MODAL: ANALYZE NEW PAPER FROM COMPARE SETUP                       -->
+    <!-- ================================================================= -->
+    <div id="compare-upload-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <!-- Backdrop with high-quality blur -->
+        <div id="compare-modal-backdrop" onclick="closeCompareUploadModal()" class="fixed inset-0 bg-[#0c0e12]/50 backdrop-blur-md transition-opacity duration-300"></div>
+
+        <!-- Centered Dialog Card -->
+        <div id="compare-modal-dialog" class="relative w-full max-w-lg bg-white dark:bg-[#14171d] border border-[#e5e5de] dark:border-[#242934] rounded-2xl shadow-2xl p-6 sm:p-7 overflow-hidden z-10 modal-animate-in">
+            <!-- Modal Header -->
+            <div class="flex items-start justify-between gap-4 pb-4 border-b border-[#e5e5de] dark:border-[#242934]">
+                <div class="space-y-1">
+                    <span class="text-[10px] font-mono uppercase tracking-wider text-[#1e3a8a] dark:text-[#3b82f6] font-semibold">Intake Pipeline</span>
+                    <h3 class="font-serif text-lg font-semibold text-[#121316] dark:text-[#f1f3f7]">Analyze Paper for Comparison</h3>
+                    <p class="text-xs text-[#787f91] dark:text-[#646e82]">Upload a manuscript to run neural extraction and stage it directly into this comparison.</p>
+                </div>
+                <button type="button" onclick="closeCompareUploadModal()" class="p-1.5 rounded-lg text-[#787f91] hover:text-[#121316] dark:hover:text-[#f1f3f7] hover:bg-[#f3f3ee] dark:hover:bg-[#1a1e26] transition-all cursor-pointer shrink-0" title="Close" aria-label="Close dialog">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body (Two states: Upload state & Real Processing state) -->
+            <div class="pt-5">
+                <!-- State A: Upload Dropzone -->
+                <div id="compare-modal-upload-state">
+                    <input type="file" id="compare-modal-file-input" accept=".pdf" class="hidden" onchange="handleCompareModalFileSelect(event)">
+                    
+                    <div
+                        id="compare-modal-dropzone"
+                        onclick="document.getElementById('compare-modal-file-input').click()"
+                        class="rounded-xl border border-dashed border-[#d2d2cc] dark:border-[#373e4d] hover:border-[#1e3a8a] dark:hover:border-[#3b82f6] bg-[#fbfbf9] dark:bg-[#111317] p-8 text-center cursor-pointer transition-all hover:bg-[#eff4fe]/20 dark:hover:bg-[#172554]/10 select-none group"
+                    >
+                        <div class="w-12 h-12 rounded-xl bg-[#eff4fe] dark:bg-[#172554] text-[#1e3a8a] dark:text-[#3b82f6] flex items-center justify-center mx-auto mb-3 shadow-2xs group-hover:scale-105 transition-transform">
+                            <i data-lucide="upload-cloud" class="w-6 h-6"></i>
+                        </div>
+                        <p class="font-serif text-sm font-semibold text-[#121316] dark:text-[#f1f3f7] mb-1">
+                            Drop research paper here
+                        </p>
+                        <p class="text-xs text-[#787f91] dark:text-[#646e82] mb-3">
+                            or <span class="text-[#1e3a8a] dark:text-[#3b82f6] font-medium underline underline-offset-2">choose a PDF</span> from your computer
+                        </p>
+                        <div class="inline-flex items-center gap-2 text-[10px] font-mono text-[#787f91] dark:text-[#646e82] border border-[#e5e5de] dark:border-[#242934] rounded-full px-2.5 py-0.5 bg-white dark:bg-[#14171d]">
+                            <span>Single PDF</span>
+                            <span class="w-px h-2.5 bg-[#d2d2cc] dark:bg-[#373e4d]"></span>
+                            <span>Direct Intake</span>
+                        </div>
+                    </div>
+
+                    <!-- Selected file ready to submit -->
+                    <div id="compare-modal-staged-file" class="hidden mt-4 space-y-3">
+                        <div class="flex items-center justify-between p-3 rounded-lg border border-[#e5e5de] dark:border-[#242934] bg-[#fbfbf9] dark:bg-[#111317] text-xs">
+                            <div class="flex items-center gap-2.5 min-w-0 pr-2">
+                                <i data-lucide="file-text" class="w-4 h-4 text-[#1e3a8a] dark:text-[#3b82f6] shrink-0"></i>
+                                <span id="compare-modal-file-name" class="font-serif font-medium truncate text-[#121316] dark:text-[#f1f3f7]"></span>
+                                <span id="compare-modal-file-size" class="text-[10px] font-mono text-[#787f91] shrink-0"></span>
+                            </div>
+                            <button type="button" onclick="clearCompareModalFile()" class="p-1 rounded text-[#787f91] hover:text-[#991b1b] dark:hover:text-[#f87171] transition-colors cursor-pointer" title="Remove">
+                                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                        <button type="button" onclick="submitCompareModalFile()" class="w-full py-2.5 rounded-xl bg-[#1e3a8a] dark:bg-[#3b82f6] text-white text-xs font-medium hover:bg-[#172554] dark:hover:bg-[#2563eb] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer">
+                            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                            <span>Analyze & Stage Manuscript</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- State B: Real Processing Pipeline -->
+                <div id="compare-modal-processing-state" class="hidden space-y-4">
+                    <div class="flex items-center gap-3 pb-3 border-b border-[#e5e5de] dark:border-[#242934]">
+                        <div class="w-8 h-8 rounded-lg bg-[#eff4fe] dark:bg-[#172554] text-[#1e3a8a] dark:text-[#3b82f6] flex items-center justify-center shrink-0">
+                            <i data-lucide="cpu" class="w-4 h-4 animate-pulse"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="font-serif text-sm font-semibold text-[#121316] dark:text-[#f1f3f7]">Processing manuscript</p>
+                            <p class="text-[11px] text-[#787f91] dark:text-[#646e82] font-mono truncate" id="compare-modal-processing-filename">Running real extraction...</p>
+                        </div>
+                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#eff4fe] dark:bg-[#172554] text-[#1e3a8a] dark:text-[#3b82f6] font-mono text-[10px]">
+                            <span class="w-1.5 h-1.5 rounded-full bg-[#1e3a8a] dark:bg-[#3b82f6] animate-ping"></span>
+                            Live
+                        </span>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div>
+                        <div class="w-full h-1.5 rounded-full bg-[#f3f3ee] dark:bg-[#1a1e26] overflow-hidden" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="compare-modal-progress-track">
+                            <div id="compare-modal-progress-bar" class="h-full bg-[#1e3a8a] dark:bg-[#3b82f6] rounded-full transition-all duration-500 ease-out" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- 4 Real Processing Stages -->
+                    <div class="space-y-1.5 text-xs">
+                        <!-- Stage 1 -->
+                        <div id="cmp-stage-row-1" class="flex items-center justify-between py-2 px-3 rounded-lg bg-[#fbfbf9] dark:bg-[#111317]">
+                            <div class="flex items-center gap-2.5">
+                                <div id="cmp-stage-icon-1" class="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[#1e3a8a] dark:text-[#3b82f6]">
+                                    <i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i>
+                                </div>
+                                <span id="cmp-stage-title-1" class="font-medium text-[#121316] dark:text-[#f1f3f7]">Extracting manuscript text</span>
+                            </div>
+                            <span id="cmp-stage-status-1" class="font-mono text-[10px] text-[#1e3a8a] dark:text-[#3b82f6] font-medium">In progress</span>
+                        </div>
+                        <!-- Stage 2 -->
+                        <div id="cmp-stage-row-2" class="flex items-center justify-between py-2 px-3 rounded-lg opacity-50">
+                            <div class="flex items-center gap-2.5">
+                                <div id="cmp-stage-icon-2" class="w-5 h-5 rounded-full flex items-center justify-center shrink-0 border border-[#d2d2cc] dark:border-[#373e4d] text-[#787f91] text-[10px] font-mono">
+                                    <span>2</span>
+                                </div>
+                                <span id="cmp-stage-title-2" class="font-medium text-[#787f91] dark:text-[#646e82]">Detecting canonical sections</span>
+                            </div>
+                            <span id="cmp-stage-status-2" class="font-mono text-[10px] text-[#787f91] dark:text-[#646e82]">Queued</span>
+                        </div>
+                        <!-- Stage 3 -->
+                        <div id="cmp-stage-row-3" class="flex items-center justify-between py-2 px-3 rounded-lg opacity-50">
+                            <div class="flex items-center gap-2.5">
+                                <div id="cmp-stage-icon-3" class="w-5 h-5 rounded-full flex items-center justify-center shrink-0 border border-[#d2d2cc] dark:border-[#373e4d] text-[#787f91] text-[10px] font-mono">
+                                    <span>3</span>
+                                </div>
+                                <span id="cmp-stage-title-3" class="font-medium text-[#787f91] dark:text-[#646e82]">Computing extractive baseline</span>
+                            </div>
+                            <span id="cmp-stage-status-3" class="font-mono text-[10px] text-[#787f91] dark:text-[#646e82]">Queued</span>
+                        </div>
+                        <!-- Stage 4 -->
+                        <div id="cmp-stage-row-4" class="flex items-center justify-between py-2 px-3 rounded-lg opacity-50">
+                            <div class="flex items-center gap-2.5">
+                                <div id="cmp-stage-icon-4" class="w-5 h-5 rounded-full flex items-center justify-center shrink-0 border border-[#d2d2cc] dark:border-[#373e4d] text-[#787f91] text-[10px] font-mono">
+                                    <span>4</span>
+                                </div>
+                                <span id="cmp-stage-title-4" class="font-medium text-[#787f91] dark:text-[#646e82]">Generating neural summary</span>
+                            </div>
+                            <span id="cmp-stage-status-4" class="font-mono text-[10px] text-[#787f91] dark:text-[#646e82]">Queued</span>
+                        </div>
+                    </div>
+
+                    <!-- Error banner inside modal -->
+                    <div id="compare-modal-error" class="hidden mt-3 p-3 rounded-lg border border-[#991b1b]/30 bg-[#fef2f2] dark:bg-[#7f1d1d]/20 text-[#991b1b] dark:text-[#f87171] text-xs">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="font-medium">Analysis failed</span>
+                            <button type="button" onclick="document.getElementById('compare-modal-error').classList.add('hidden')" class="p-0.5 rounded hover:opacity-70 text-current cursor-pointer shrink-0" title="Dismiss error">
+                                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                        <p id="compare-modal-error-text" class="mt-1 opacity-90"></p>
+                        <button type="button" onclick="resetCompareModalToUpload()" class="mt-2 underline font-medium hover:no-underline cursor-pointer">Try again</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ================================================================= -->
     <!-- JAVASCRIPT STATE & APPLICATION CONTROLLER -->
     <!-- ================================================================= -->
@@ -1581,6 +1954,9 @@
             isIngesting: false,
             analysisMode: 'brief', // 'brief' (default) or 'deepdive'
             evaluationSelectedPaperId: null,
+            hasCompared: false,
+            isLibrarySelectionMode: false,
+            recentComparisonReport: null,
         };
 
         // Initialize application on DOM ready
@@ -1588,6 +1964,7 @@
             initTheme();
             lucide.createIcons();
             initLanding();
+            initNavDropdowns();
             loadLibrary(); // preload in background, no navigation
         });
 
@@ -1652,9 +2029,253 @@
         }
 
         // -------------------------------------------------------------
+        // Coordinated Workspace Nav Menus (Single-State Architecture)
+        // -------------------------------------------------------------
+        let activeNavMenu = null; // 'analysis' | 'compare' | null
+        let navMenuCloseTimer = null;
+
+        function setNavMenu(menuId, instant = false) {
+            if (activeNavMenu === menuId) {
+                cancelNavMenuCloseTimer();
+                return;
+            }
+
+            cancelNavMenuCloseTimer();
+            const prevMenu = activeNavMenu;
+            activeNavMenu = menuId;
+
+            const menuMap = {
+                analysis: {
+                    el: document.getElementById('nav-analysis-dropdown'),
+                    btn: document.getElementById('nav-analysis-btn')
+                },
+                compare: {
+                    el: document.getElementById('nav-compare-dropdown'),
+                    btn: document.getElementById('nav-compare-btn')
+                }
+            };
+
+            // 1. Close previously active menu
+            if (prevMenu && menuMap[prevMenu]) {
+                const prev = menuMap[prevMenu];
+                if (prev.btn) prev.btn.setAttribute('aria-expanded', 'false');
+
+                if (prev.el) {
+                    if (menuId || instant) {
+                        // Immediately snap closed without transition so two menus NEVER coexist
+                        prev.el.style.transition = 'none';
+                        prev.el.classList.remove('is-open');
+                        void prev.el.offsetHeight; // force reflow
+                        prev.el.style.transition = '';
+                    } else {
+                        // Smooth fade out when leaving menus altogether
+                        prev.el.classList.remove('is-open');
+                    }
+                }
+            }
+
+            // 2. Open newly active menu
+            if (menuId && menuMap[menuId]) {
+                const next = menuMap[menuId];
+                if (next.btn) next.btn.setAttribute('aria-expanded', 'true');
+                if (next.el) {
+                    next.el.classList.add('is-open');
+                }
+            }
+        }
+
+        function scheduleNavMenuClose(delay = 130) {
+            cancelNavMenuCloseTimer();
+            navMenuCloseTimer = setTimeout(() => {
+                setNavMenu(null);
+            }, delay);
+        }
+
+        function cancelNavMenuCloseTimer() {
+            if (navMenuCloseTimer) {
+                clearTimeout(navMenuCloseTimer);
+                navMenuCloseTimer = null;
+            }
+        }
+
+        function initNavDropdowns() {
+            const wrapAnalysis = document.getElementById('nav-wrapper-analysis');
+            const wrapCompare = document.getElementById('nav-wrapper-compare');
+            const btnAnalysis = document.getElementById('nav-analysis-btn');
+            const btnCompare = document.getElementById('nav-compare-btn');
+            const dropAnalysis = document.getElementById('nav-analysis-dropdown');
+            const dropCompare = document.getElementById('nav-compare-dropdown');
+
+            if (!wrapAnalysis || !wrapCompare) return;
+
+            // Hover on Analyze wrapper (trigger + dropdown)
+            wrapAnalysis.addEventListener('mouseenter', () => {
+                cancelNavMenuCloseTimer();
+                setNavMenu('analysis');
+            });
+            wrapAnalysis.addEventListener('mouseleave', () => {
+                scheduleNavMenuClose(130);
+            });
+
+            // Hover on Compare wrapper (trigger + dropdown)
+            wrapCompare.addEventListener('mouseenter', () => {
+                cancelNavMenuCloseTimer();
+                setNavMenu('compare');
+            });
+            wrapCompare.addEventListener('mouseleave', () => {
+                scheduleNavMenuClose(130);
+            });
+
+            // Hover inside dropdowns cancels any pending close timer
+            if (dropAnalysis) {
+                dropAnalysis.addEventListener('mouseenter', cancelNavMenuCloseTimer);
+            }
+            if (dropCompare) {
+                dropCompare.addEventListener('mouseenter', cancelNavMenuCloseTimer);
+            }
+
+            // Moving into adjacent non-dropdown nav tabs (Library, Evaluation) immediately closes open menu
+            document.querySelectorAll('#global-nav > button[data-nav]').forEach(btn => {
+                btn.addEventListener('mouseenter', () => {
+                    setNavMenu(null, true);
+                });
+            });
+
+            // Keyboard Focus Management:
+            // Focus on Analyze button opens its menu
+            if (btnAnalysis) {
+                btnAnalysis.addEventListener('focus', () => {
+                    cancelNavMenuCloseTimer();
+                    setNavMenu('analysis');
+                });
+            }
+            // Focus on Compare button opens its menu
+            if (btnCompare) {
+                btnCompare.addEventListener('focus', () => {
+                    cancelNavMenuCloseTimer();
+                    setNavMenu('compare');
+                });
+            }
+
+            [wrapAnalysis, wrapCompare].forEach(wrap => {
+                wrap.addEventListener('focusin', () => {
+                    cancelNavMenuCloseTimer();
+                    if (wrap === wrapAnalysis) setNavMenu('analysis');
+                    else if (wrap === wrapCompare) setNavMenu('compare');
+                });
+                wrap.addEventListener('focusout', (e) => {
+                    if (!wrap.contains(e.relatedTarget)) {
+                        scheduleNavMenuClose(100);
+                    }
+                });
+            });
+
+            // Escape key closes active modal or active nav menu
+            const handleGlobalEscape = (e) => {
+                if (e.key === 'Escape' || e.key === 'Esc') {
+                    const modal = document.getElementById('compare-upload-modal');
+                    if (modal && !modal.classList.contains('hidden')) {
+                        closeCompareUploadModal();
+                        return;
+                    }
+                    if (activeNavMenu) {
+                        const closing = activeNavMenu;
+                        setNavMenu(null, true);
+                        const triggerBtn = closing === 'analysis' ? btnAnalysis : btnCompare;
+                        if (triggerBtn && typeof triggerBtn.focus === 'function') {
+                            try { triggerBtn.focus(); } catch (_) {}
+                        }
+                    }
+                }
+            };
+            document.addEventListener('keydown', handleGlobalEscape);
+            window.addEventListener('keydown', handleGlobalEscape);
+
+            // Clicking outside closes menu immediately
+            const handleGlobalClickAway = (e) => {
+                if (!activeNavMenu) return;
+                const target = e.target instanceof Element ? e.target : e.target?.parentElement;
+                if (!target || (!target.closest('#nav-wrapper-analysis') && !target.closest('#nav-wrapper-compare'))) {
+                    setNavMenu(null, true);
+                }
+            };
+            document.addEventListener('pointerdown', handleGlobalClickAway);
+            window.addEventListener('pointerdown', handleGlobalClickAway);
+        }
+
+        // -------------------------------------------------------------
+        // Global Workspace Action Handlers (Analyze & Compare)
+        // -------------------------------------------------------------
+        function navGoRecentAnalysis() {
+            setNavMenu(null, true);
+            if (AppState.currentPaperId) {
+                openPaperDetail(AppState.currentPaperId, AppState.analysisMode || 'brief');
+            } else if (AppState.papers.length > 0) {
+                openPaperDetail(AppState.papers[0].paper_id, 'brief');
+            } else {
+                showToast("No manuscripts analyzed yet. Upload a paper to begin.", "info");
+                navigateTo('landing');
+            }
+        }
+
+        function navGoNewAnalysis() {
+            setNavMenu(null, true);
+            navigateTo('landing');
+            landingResetToUpload();
+        }
+
+        function navGoRecentCompare() {
+            setNavMenu(null, true);
+            if (AppState.hasCompared && AppState.selectedForCompare.size >= 2) {
+                navigateTo('compare');
+                showCompareResults();
+            } else {
+                navigateTo('compare');
+                openCompareSetup();
+            }
+        }
+
+        function navGoNewCompare() {
+            setNavMenu(null, true);
+            // Requirement 15: New Comparison must start with a clean comparison setup
+            AppState.selectedForCompare.clear();
+            AppState.hasCompared = false;
+            AppState.recentComparisonReport = null;
+            renderLibraryTable();
+            updateCompareSelectionBar();
+            navigateTo('compare');
+            openCompareSetup();
+        }
+
+        function updateNavSubtitles() {
+            const analysisSub = document.getElementById('nav-recent-analysis-name');
+            const compareSub = document.getElementById('nav-recent-compare-desc');
+            if (analysisSub) {
+                if (AppState.currentPaperData && AppState.currentPaperData.filename) {
+                    analysisSub.innerText = AppState.currentPaperData.filename;
+                } else if (AppState.papers.length > 0) {
+                    analysisSub.innerText = AppState.papers[0].filename || 'Resume active paper';
+                } else {
+                    analysisSub.innerText = 'No active analysis';
+                }
+            }
+            if (compareSub) {
+                const count = AppState.selectedForCompare.size;
+                if (AppState.hasCompared) {
+                    compareSub.innerText = `Active synthesis (${count} papers)`;
+                } else if (count > 0) {
+                    compareSub.innerText = `${count} manuscript${count > 1 ? 's' : ''} staged`;
+                } else {
+                    compareSub.innerText = 'Clean setup workspace';
+                }
+            }
+        }
+
+        // -------------------------------------------------------------
         // Navigation Switcher
         // -------------------------------------------------------------
         function navigateTo(screenId) {
+            setNavMenu(null, true);
             // Guard: 'ingest' should ALWAYS route to the new 'landing' experience
             if (screenId === 'ingest') {
                 screenId = 'landing';
@@ -1676,6 +2297,12 @@
                 }
             }
 
+
+            // Reset library selection mode if navigating elsewhere
+            if (screenId !== 'library' && screenId !== 'compare') {
+                AppState.isLibrarySelectionMode = false;
+            }
+
             // Hide all screen sections
             document.querySelectorAll('.screen-view').forEach(el => el.classList.add('hidden'));
 
@@ -1687,12 +2314,17 @@
 
             // Update top-level nav buttons
             document.querySelectorAll('.nav-tab').forEach(btn => {
-                if (btn.getAttribute('data-nav') === screenId) {
-                    btn.className = "nav-tab px-3.5 py-1 rounded text-xs font-medium transition-all text-[#121316] dark:text-[#f1f3f7] bg-white dark:bg-[#20242e] shadow-sm";
+                const isCurrent = btn.getAttribute('data-nav') === screenId;
+                if (isCurrent) {
+                    btn.classList.add('text-[#121316]', 'dark:text-[#f1f3f7]', 'bg-white', 'dark:bg-[#20242e]', 'shadow-sm');
+                    btn.classList.remove('text-[#4b5262]', 'dark:text-[#949daf]');
                 } else {
-                    btn.className = "nav-tab px-3.5 py-1 rounded text-xs font-medium transition-all text-[#4b5262] dark:text-[#949daf] hover:text-[#121316] dark:hover:text-[#f1f3f7]";
+                    btn.classList.remove('text-[#121316]', 'dark:text-[#f1f3f7]', 'bg-white', 'dark:bg-[#20242e]', 'shadow-sm');
+                    btn.classList.add('text-[#4b5262]', 'dark:text-[#949daf]');
                 }
             });
+
+            updateNavSubtitles();
 
             // Contextual loaders
             if (screenId === 'library') {
@@ -1753,12 +2385,16 @@
 
         function landingRemoveFile(index) {
             AppState.stagedFiles.splice(index, 1);
+            const input = document.getElementById('landing-file-input');
+            if (input) input.value = '';
             landingRenderSelectedFiles();
             renderStagingQueue();
         }
 
         function landingClearFiles() {
             AppState.stagedFiles = [];
+            const input = document.getElementById('landing-file-input');
+            if (input) input.value = '';
             landingRenderSelectedFiles();
             renderStagingQueue();
         }
@@ -2039,7 +2675,9 @@
                 // Seamless transition to result view AFTER processing is complete
                 if (wasMulti && processedPapers.length > 1) {
                     AppState.selectedForCompare = new Set(processedPapers.map(p => p.paper_id));
+                    AppState.hasCompared = false;
                     navigateTo('compare');
+                    openCompareSetup();
                 } else if (processedPapers.length > 0) {
                     const firstPaper = processedPapers[0];
                     AppState.currentPaperId = firstPaper.paper_id;
@@ -2102,12 +2740,17 @@
 
             function drawFrame() {
                 const isDark = document.documentElement.classList.contains('dark');
+                // Editorial grid colors:
+                // Light mode: subtle Oxford-blue parchment coordinate lines & node points
+                // Dark mode: clearly visible cool slate-blue architectural lines & nodes, never neon/glaring
                 const lineColor = isDark
-                    ? 'rgba(59, 130, 246, 0.055)'
-                    : 'rgba(30, 58, 138, 0.045)';
+                    ? 'rgba(148, 175, 215, 0.22)'
+                    : 'rgba(30, 58, 138, 0.12)';
                 const dotColor = isDark
-                    ? 'rgba(59, 130, 246, 0.10)'
-                    : 'rgba(30, 58, 138, 0.09)';
+                    ? 'rgba(175, 205, 245, 0.45)'
+                    : 'rgba(30, 58, 138, 0.28)';
+                const lineWidth = 0.95;
+                const dotRadius = 1.85;
 
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -2132,7 +2775,7 @@
 
                 // Draw horizontal lines
                 ctx.strokeStyle = lineColor;
-                ctx.lineWidth = 0.75;
+                ctx.lineWidth = lineWidth;
                 for (let r = 0; r <= ROWS; r++) {
                     ctx.beginPath();
                     for (let c = 0; c <= COLS; c++) {
@@ -2160,13 +2803,16 @@
                     for (let c = 0; c <= COLS; c++) {
                         const n = nodes[r][c];
                         ctx.beginPath();
-                        ctx.arc(n.x, n.y, 1.5, 0, Math.PI * 2);
+                        ctx.arc(n.x, n.y, dotRadius, 0, Math.PI * 2);
                         ctx.fill();
                     }
                 }
 
-                t += waveSpeed * 16; // ~16ms per frame at 60fps
-                animFrameId = requestAnimationFrame(drawFrame);
+                const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                if (!prefersReduced) {
+                    t += waveSpeed * 16; // ~16ms per frame at 60fps
+                    animFrameId = requestAnimationFrame(drawFrame);
+                }
             }
 
             // Only run canvas when landing is visible
@@ -2183,49 +2829,97 @@
                 observer.observe(landingEl, { attributes: true, attributeFilter: ['class'] });
             }
 
-            // Respect prefers-reduced-motion
-            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-                drawFrame();
-            }
+            drawFrame();
         }
 
         // -------------------------------------------------------------
         // Toast Notifications
         // -------------------------------------------------------------
+        // Toast Notifications with Interactive Dismissal
+        // -------------------------------------------------------------
         function showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');
+            if (!container) return;
             const toast = document.createElement('div');
             
             const borderColors = type === 'error' 
                 ? 'border-[#991b1b] bg-[#fef2f2] text-[#991b1b] dark:bg-[#7f1d1d] dark:text-white' 
                 : (type === 'success' ? 'border-[#065f46] bg-[#ecfdf5] text-[#065f46] dark:bg-[#064e3b] dark:text-white' : 'border-[#e5e5de] bg-white dark:bg-[#14171d] text-[#121316] dark:text-[#f1f3f7]');
 
-            toast.className = `border ${borderColors} px-4 py-2.5 rounded-md shadow-md text-xs font-medium flex items-center gap-2 pointer-events-auto transition-all duration-200 translate-y-2 opacity-0`;
-            toast.innerHTML = `<span>${escapeHtml(message)}</span>`;
+            toast.className = `border ${borderColors} px-4 py-2.5 rounded-md shadow-md text-xs font-medium flex items-center justify-between gap-3 pointer-events-auto transition-all duration-200 translate-y-2 opacity-0 max-w-sm`;
+            toast.innerHTML = `
+                <span class="flex-1 leading-snug">${escapeHtml(message)}</span>
+                <button type="button" class="toast-dismiss-btn p-0.5 rounded hover:opacity-70 transition-opacity cursor-pointer shrink-0 text-current" title="Dismiss" aria-label="Dismiss notification">
+                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                </button>
+            `;
 
             container.appendChild(toast);
-            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
-            setTimeout(() => {
+
+            let dismissed = false;
+            const dismissToast = () => {
+                if (dismissed) return;
+                dismissed = true;
                 toast.classList.add('translate-y-2', 'opacity-0');
                 setTimeout(() => toast.remove(), 250);
-            }, 3200);
+            };
+
+            const btn = toast.querySelector('.toast-dismiss-btn');
+            if (btn) {
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    dismissToast();
+                };
+            }
+
+            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+            setTimeout(dismissToast, 4000);
+            lucide.createIcons();
         }
 
         // -------------------------------------------------------------
         // Library Management (GET /api/papers)
         // -------------------------------------------------------------
-        async function loadLibrary() {
-            try {
-                const res = await fetch('/api/papers');
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const data = await res.json();
-                AppState.papers = data.papers || [];
+        let libraryFetchPromise = null;
+
+        async function loadLibrary(force = false) {
+            // Render existing papers immediately so repeated navigation is instant
+            if (AppState.papers.length > 0) {
                 renderLibraryTable();
                 updateLibraryCountBadge();
-            } catch (err) {
-                console.error("Library load error:", err);
-                showToast("Could not load manuscript library", "error");
             }
+
+            // Deduplicate in-flight requests to avoid racing
+            if (libraryFetchPromise && !force) {
+                return libraryFetchPromise;
+            }
+
+            libraryFetchPromise = (async () => {
+                let fetchedPapers = null;
+                try {
+                    const res = await fetch('/api/papers');
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    const data = await res.json();
+                    fetchedPapers = data.papers || [];
+                } catch (err) {
+                    console.error("Library load error:", err);
+                    // Only show error toast if the request genuinely failed and we have no cached data
+                    if (AppState.papers.length === 0) {
+                        showToast("Could not load manuscript library", "error");
+                    }
+                    return;
+                } finally {
+                    libraryFetchPromise = null;
+                }
+
+                if (fetchedPapers !== null) {
+                    AppState.papers = fetchedPapers;
+                    renderLibraryTable();
+                    updateLibraryCountBadge();
+                }
+            })();
+
+            return libraryFetchPromise;
         }
 
         function updateLibraryCountBadge() {
@@ -2246,15 +2940,17 @@
             const emptyState = document.getElementById('library-empty-state');
             const contentContainer = document.getElementById('library-content-container');
 
+            if (!tbody) return;
             tbody.innerHTML = '';
 
             if (AppState.papers.length === 0) {
-                emptyState.classList.remove('hidden');
-                contentContainer.classList.add('hidden');
+                if (emptyState) emptyState.classList.remove('hidden');
+                if (contentContainer) contentContainer.classList.add('hidden');
+                updateCompareSelectionBar();
                 return;
             }
-            emptyState.classList.add('hidden');
-            contentContainer.classList.remove('hidden');
+            if (emptyState) emptyState.classList.add('hidden');
+            if (contentContainer) contentContainer.classList.remove('hidden');
 
             AppState.papers.forEach((paper) => {
                 const tr = document.createElement('tr');
@@ -2310,11 +3006,12 @@
                 tbody.appendChild(tr);
             });
 
-            updateCompareDock();
+            updateCompareSelectionBar();
+            lucide.createIcons();
         }
 
         // -------------------------------------------------------------
-        // Comparison Selection Dock & Actions
+        // Comparison Selection Bar & Actions
         // -------------------------------------------------------------
         function toggleCompareSelect(paperId, checked) {
             if (checked) {
@@ -2326,14 +3023,21 @@
                 AppState.selectedForCompare.add(paperId);
             } else {
                 AppState.selectedForCompare.delete(paperId);
+                if (AppState.selectedForCompare.size < 2) {
+                    AppState.hasCompared = false;
+                }
             }
-            updateCompareDock();
+            renderLibraryTable();
+            updateAnalysisCompareBtnState();
         }
 
-        function updateCompareDock() {
+        function updateCompareSelectionBar() {
             const count = AppState.selectedForCompare.size;
-            const dock = document.getElementById('compare-dock');
-            const countLabel = document.getElementById('compare-dock-count');
+            const bar = document.getElementById('compare-selection-bar');
+            const label = document.getElementById('selection-bar-label');
+            const chips = document.getElementById('selection-bar-chips');
+            const continueBtn = document.getElementById('selection-bar-continue-btn');
+            const continueText = document.getElementById('selection-bar-continue-text');
             const navBadge = document.getElementById('nav-compare-count');
 
             if (navBadge) {
@@ -2345,28 +3049,349 @@
                 }
             }
 
-            if (dock && countLabel) {
-                if (count > 0) {
-                    countLabel.innerText = `${count} manuscript${count > 1 ? 's' : ''} selected`;
-                    dock.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
+            updateNavSubtitles();
+
+            if (!bar) return;
+
+            // Only display the floating selection bar while on the library screen and papers are selected
+            const shouldShow = (AppState.currentScreen === 'library') && (count > 0);
+            if (!shouldShow) {
+                bar.classList.remove('is-visible');
+                return;
+            }
+
+            bar.classList.add('is-visible');
+
+            if (label) {
+                label.innerText = `SELECTED FOR COMPARISON · ${count} ${count === 1 ? 'MANUSCRIPT' : 'MANUSCRIPTS'}`;
+            }
+
+            if (chips) {
+                chips.innerHTML = '';
+                AppState.selectedForCompare.forEach(id => {
+                    const paper = AppState.papers.find(p => p.paper_id === id);
+                    const title = paper ? paper.filename : id;
+                    const chip = document.createElement('div');
+                    chip.className = "flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#f3f3ee] dark:bg-[#1a1e26] border border-[#e5e5de] dark:border-[#242934] text-xs font-serif shrink-0";
+                    chip.innerHTML = `
+                        <span class="truncate max-w-[140px] text-[#121316] dark:text-[#f1f3f7]">${escapeHtml(title)}</span>
+                        <button type="button" class="chip-remove-btn text-[#787f91] hover:text-[#991b1b] dark:hover:text-[#f87171] p-0.5 rounded-full cursor-pointer" title="Remove manuscript">
+                            <i data-lucide="x" class="w-3 h-3"></i>
+                        </button>
+                    `;
+                    const removeBtn = chip.querySelector('.chip-remove-btn');
+                    if (removeBtn) {
+                        removeBtn.onclick = (e) => {
+                            e.stopPropagation();
+                            toggleCompareSelect(id, false);
+                        };
+                    }
+                    chips.appendChild(chip);
+                });
+            }
+
+            if (continueBtn && continueText) {
+                if (AppState.isLibrarySelectionMode) {
+                    continueBtn.disabled = false;
+                    continueBtn.onclick = exitLibraryCompareMode;
+                    continueText.innerText = "Done with Selection →";
+                    continueBtn.title = "Return to Compare Setup with selected manuscripts";
+                } else if (count === 1) {
+                    continueBtn.disabled = true;
+                    continueBtn.onclick = null;
+                    continueText.innerText = "Select 1 more to compare";
+                    continueBtn.title = "At least 2 manuscripts required for comparison";
                 } else {
-                    dock.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
+                    continueBtn.disabled = false;
+                    continueBtn.onclick = continueToCompareSetup;
+                    continueText.innerText = "Continue to Compare →";
+                    continueBtn.title = "Proceed to Compare Setup";
                 }
             }
+
+            lucide.createIcons();
         }
 
         function clearComparisonSelection() {
             AppState.selectedForCompare.clear();
+            AppState.hasCompared = false;
+            AppState.recentComparisonReport = null;
             renderLibraryTable();
-            updateCompareDock();
+            updateAnalysisCompareBtnState();
         }
 
-        function launchComparisonFromDock() {
+        function continueToCompareSetup() {
             if (AppState.selectedForCompare.size < 2) {
                 showToast("Select at least 2 papers to synthesize", "error");
                 return;
             }
             navigateTo('compare');
+            openCompareSetup();
+        }
+
+        function compareSetupAddFromLibrary() {
+            AppState.isLibrarySelectionMode = true;
+            navigateTo('library');
+            updateCompareSelectionBar();
+        }
+
+        function exitLibraryCompareMode() {
+            AppState.isLibrarySelectionMode = false;
+            navigateTo('compare');
+            openCompareSetup();
+        }
+
+        function compareSetupAnalyzeNewPaper() {
+            openCompareUploadModal();
+        }
+
+        // -------------------------------------------------------------
+        // Compare Intake Modal (In-place manuscript analysis for Compare Setup)
+        // -------------------------------------------------------------
+        let compareModalSelectedFile = null;
+        let compareModalTimers = [];
+
+        function openCompareUploadModal() {
+            const modal = document.getElementById('compare-upload-modal');
+            if (!modal) return;
+            resetCompareModalToUpload();
+            modal.classList.remove('hidden');
+            initCompareModalDragDrop();
+            lucide.createIcons();
+        }
+
+        function closeCompareUploadModal() {
+            const modal = document.getElementById('compare-upload-modal');
+            if (!modal) return;
+            clearCompareModalTimers();
+            modal.classList.add('hidden');
+            compareModalSelectedFile = null;
+            const input = document.getElementById('compare-modal-file-input');
+            if (input) input.value = '';
+        }
+
+        function clearCompareModalTimers() {
+            compareModalTimers.forEach(t => clearTimeout(t));
+            compareModalTimers = [];
+        }
+
+        function resetCompareModalToUpload() {
+            clearCompareModalTimers();
+            compareModalSelectedFile = null;
+            const uploadState = document.getElementById('compare-modal-upload-state');
+            const processingState = document.getElementById('compare-modal-processing-state');
+            const stagedFile = document.getElementById('compare-modal-staged-file');
+            const dropzone = document.getElementById('compare-modal-dropzone');
+            const errBox = document.getElementById('compare-modal-error');
+
+            if (uploadState) uploadState.classList.remove('hidden');
+            if (processingState) processingState.classList.add('hidden');
+            if (stagedFile) stagedFile.classList.add('hidden');
+            if (dropzone) dropzone.classList.remove('hidden');
+            if (errBox) errBox.classList.add('hidden');
+
+            setCompareModalProgress(0);
+            setCompareModalStage(1, 'active');
+            for (let i = 2; i <= 4; i++) {
+                setCompareModalStage(i, 'queued');
+            }
+        }
+
+        function initCompareModalDragDrop() {
+            const zone = document.getElementById('compare-modal-dropzone');
+            if (!zone || zone._dragInitialized) return;
+            zone._dragInitialized = true;
+
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zone.classList.add('border-[#1e3a8a]', 'dark:border-[#3b82f6]', 'bg-[#eff4fe]/40', 'dark:bg-[#172554]/30');
+            });
+            zone.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                zone.classList.remove('border-[#1e3a8a]', 'dark:border-[#3b82f6]', 'bg-[#eff4fe]/40', 'dark:bg-[#172554]/30');
+            });
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('border-[#1e3a8a]', 'dark:border-[#3b82f6]', 'bg-[#eff4fe]/40', 'dark:bg-[#172554]/30');
+                const files = Array.from(e.dataTransfer.files || []).filter(f => f.name.endsWith('.pdf'));
+                if (files.length === 0) {
+                    showToast('Only PDF files are accepted', 'error');
+                    return;
+                }
+                stageCompareModalFile(files[0]);
+            });
+        }
+
+        function handleCompareModalFileSelect(event) {
+            const files = Array.from(event.target.files || []).filter(f => f.name.endsWith('.pdf'));
+            if (files.length === 0) return;
+            stageCompareModalFile(files[0]);
+            event.target.value = '';
+        }
+
+        function stageCompareModalFile(file) {
+            compareModalSelectedFile = file;
+            const dropzone = document.getElementById('compare-modal-dropzone');
+            const stagedFile = document.getElementById('compare-modal-staged-file');
+            const nameEl = document.getElementById('compare-modal-file-name');
+            const sizeEl = document.getElementById('compare-modal-file-size');
+
+            if (dropzone) dropzone.classList.add('hidden');
+            if (stagedFile) stagedFile.classList.remove('hidden');
+            if (nameEl) nameEl.innerText = file.name;
+            if (sizeEl) sizeEl.innerText = `(${(file.size / 1024).toFixed(1)} KB)`;
+            lucide.createIcons();
+        }
+
+        function clearCompareModalFile() {
+            compareModalSelectedFile = null;
+            const dropzone = document.getElementById('compare-modal-dropzone');
+            const stagedFile = document.getElementById('compare-modal-staged-file');
+            const input = document.getElementById('compare-modal-file-input');
+            if (dropzone) dropzone.classList.remove('hidden');
+            if (stagedFile) stagedFile.classList.add('hidden');
+            if (input) input.value = '';
+        }
+
+        function setCompareModalProgress(percent) {
+            const bar = document.getElementById('compare-modal-progress-bar');
+            const track = document.getElementById('compare-modal-progress-track');
+            if (bar) bar.style.width = `${percent}%`;
+            if (track) track.setAttribute('aria-valuenow', percent);
+        }
+
+        function setCompareModalStage(stageNum, state) {
+            const row = document.getElementById(`cmp-stage-row-${stageNum}`);
+            const icon = document.getElementById(`cmp-stage-icon-${stageNum}`);
+            const title = document.getElementById(`cmp-stage-title-${stageNum}`);
+            const status = document.getElementById(`cmp-stage-status-${stageNum}`);
+            if (!row || !icon || !title || !status) return;
+
+            if (state === 'queued') {
+                row.className = "flex items-center justify-between py-2 px-3 rounded-lg opacity-50";
+                icon.className = "w-5 h-5 rounded-full flex items-center justify-center shrink-0 border border-[#d2d2cc] dark:border-[#373e4d] text-[#787f91] text-[10px] font-mono";
+                icon.innerHTML = `<span>${stageNum}</span>`;
+                title.className = "font-medium text-[#787f91] dark:text-[#646e82]";
+                status.className = "font-mono text-[10px] text-[#787f91] dark:text-[#646e82]";
+                status.innerText = "Queued";
+            } else if (state === 'active') {
+                row.className = "flex items-center justify-between py-2 px-3 rounded-lg bg-[#eff4fe]/80 dark:bg-[#172554]/50 border border-[#1e3a8a]/20 dark:border-[#3b82f6]/30";
+                icon.className = "w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[#1e3a8a] dark:text-[#3b82f6]";
+                icon.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i>`;
+                title.className = "font-medium text-[#121316] dark:text-[#f1f3f7]";
+                status.className = "font-mono text-[10px] text-[#1e3a8a] dark:text-[#3b82f6] font-medium";
+                status.innerText = "In progress";
+            } else if (state === 'done') {
+                row.className = "flex items-center justify-between py-2 px-3 rounded-lg bg-[#ecfdf5]/80 dark:bg-[#064e3b]/30";
+                icon.className = "w-5 h-5 rounded-full flex items-center justify-center shrink-0 bg-[#065f46] dark:bg-[#34d399] text-white";
+                icon.innerHTML = `<i data-lucide="check" class="w-3 h-3"></i>`;
+                title.className = "font-medium text-[#121316] dark:text-[#f1f3f7]";
+                status.className = "font-mono text-[10px] text-[#065f46] dark:text-[#34d399] font-medium";
+                status.innerText = "Done";
+            }
+            lucide.createIcons();
+        }
+
+        async function submitCompareModalFile() {
+            if (!compareModalSelectedFile) return;
+
+            const uploadState = document.getElementById('compare-modal-upload-state');
+            const processingState = document.getElementById('compare-modal-processing-state');
+            const filenameEl = document.getElementById('compare-modal-processing-filename');
+            const errBox = document.getElementById('compare-modal-error');
+            const errText = document.getElementById('compare-modal-error-text');
+
+            if (uploadState) uploadState.classList.add('hidden');
+            if (processingState) processingState.classList.remove('hidden');
+            if (errBox) errBox.classList.add('hidden');
+            if (filenameEl) filenameEl.innerText = compareModalSelectedFile.name;
+
+            clearCompareModalTimers();
+            setCompareModalProgress(8);
+            setCompareModalStage(1, 'active');
+            for (let i = 2; i <= 4; i++) setCompareModalStage(i, 'queued');
+
+            // Realistic stage choreography while waiting for real backend response
+            compareModalTimers.push(setTimeout(() => {
+                setCompareModalStage(1, 'done');
+                setCompareModalStage(2, 'active');
+                setCompareModalProgress(35);
+            }, 1000));
+
+            compareModalTimers.push(setTimeout(() => {
+                setCompareModalStage(2, 'done');
+                setCompareModalStage(3, 'active');
+                setCompareModalProgress(65);
+            }, 2200));
+
+            compareModalTimers.push(setTimeout(() => {
+                setCompareModalStage(3, 'done');
+                setCompareModalStage(4, 'active');
+                setCompareModalProgress(88);
+            }, 3400));
+
+            const formData = new FormData();
+            formData.append('files', compareModalSelectedFile);
+
+            try {
+                const res = await fetch('/api/analyze', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!res.ok) {
+                    const errData = await res.json().catch(() => ({}));
+                    throw new Error(errData.detail || `Upload failed with HTTP ${res.status}`);
+                }
+
+                clearCompareModalTimers();
+                setCompareModalProgress(100);
+                for (let i = 1; i <= 4; i++) {
+                    setCompareModalStage(i, 'done');
+                }
+
+                await new Promise(r => setTimeout(r, 500));
+
+                const data = await res.json();
+                const processedPapers = data.papers || [];
+
+                if (processedPapers.length > 0) {
+                    const newPaper = processedPapers[0];
+
+                    // Check if already in AppState.papers, else prepend
+                    const existingIdx = AppState.papers.findIndex(p => p.paper_id === newPaper.paper_id);
+                    if (existingIdx === -1) {
+                        AppState.papers.unshift(newPaper);
+                    } else {
+                        AppState.papers[existingIdx] = newPaper;
+                    }
+
+                    // Add new manuscript to selectedForCompare, PRESERVING all previous selections!
+                    AppState.selectedForCompare.add(newPaper.paper_id);
+                    AppState.hasCompared = false;
+
+                    // Refresh library in background
+                    loadLibrary(true);
+
+                    // Close modal and refresh Compare Setup
+                    closeCompareUploadModal();
+                    renderLibraryTable();
+                    updateCompareSelectionBar();
+                    renderCompareSetup();
+
+                    showToast(`"${newPaper.filename || 'Manuscript'}" analyzed and staged for comparison`, "success");
+                } else {
+                    throw new Error("No paper data returned from analysis");
+                }
+
+            } catch (err) {
+                clearCompareModalTimers();
+                console.error("Compare modal analysis error:", err);
+                if (errBox && errText) {
+                    errText.innerText = err.message || "An unexpected error occurred during processing.";
+                    errBox.classList.remove('hidden');
+                }
+            }
         }
 
         // -------------------------------------------------------------
@@ -2451,7 +3476,13 @@
         }
 
         function dismissIngestionError() {
-            document.getElementById('ingestion-error-banner').classList.add('hidden');
+            const banner = document.getElementById('ingestion-error-banner');
+            if (banner) banner.classList.add('hidden');
+        }
+
+        function dismissLandingProcessingError() {
+            const banner = document.getElementById('landing-processing-error');
+            if (banner) banner.classList.add('hidden');
         }
 
         // Stage-based progress tracker
@@ -2783,14 +3814,17 @@
             const isSelected = AppState.selectedForCompare.has(AppState.currentPaperId);
             const btn = document.getElementById('analysis-toggle-compare-btn');
             const textEl = document.getElementById('analysis-compare-btn-text');
+            const icon = document.getElementById('analysis-compare-icon');
             if (!btn) return;
 
             if (isSelected) {
                 btn.className = "px-4 py-2 rounded-lg border border-[#1e3a8a] dark:border-[#3b82f6] bg-[#1e3a8a] text-white dark:bg-[#3b82f6] dark:text-white font-medium text-xs shadow-sm transition-all flex items-center gap-2 active:scale-[0.98]";
-                if (textEl) textEl.innerText = "In Comparison · Remove";
+                if (textEl) textEl.innerText = "✓ In Comparison · Remove";
+                if (icon) icon.setAttribute('data-lucide', 'check');
             } else {
                 btn.className = "px-4 py-2 rounded-lg border border-[#1e3a8a]/40 dark:border-[#3b82f6]/40 bg-[#eff4fe] dark:bg-[#172554] text-[#1e3a8a] dark:text-[#3b82f6] hover:bg-[#1e3a8a] hover:text-white dark:hover:bg-[#3b82f6] dark:hover:text-white font-medium text-xs shadow-sm transition-all flex items-center gap-2 active:scale-[0.98] group";
-                if (textEl) textEl.innerText = "Add this paper to Compare";
+                if (textEl) textEl.innerText = "+ Add to Compare";
+                if (icon) icon.setAttribute('data-lucide', 'git-compare');
             }
             lucide.createIcons();
         }
@@ -2809,25 +3843,131 @@
         }
 
         // -------------------------------------------------------------
-        // Cross-Paper Comparison: Research Synthesis (POST /api/compare)
+        // Cross-Paper Comparison: Setup & Research Synthesis
         // -------------------------------------------------------------
-        async function loadComparison() {
-            const paperIds = Array.from(AppState.selectedForCompare);
-            const emptyState = document.getElementById('compare-empty-state');
-            const activeView = document.getElementById('compare-active-view');
+        function openCompareSetup() {
+            const setupView = document.getElementById('compare-setup-view');
+            const resultsView = document.getElementById('compare-results-view');
+            if (setupView) setupView.classList.remove('hidden');
+            if (resultsView) resultsView.classList.add('hidden');
+            renderCompareSetup();
+        }
 
+        function renderCompareSetup() {
+            const count = AppState.selectedForCompare.size;
+            const heading = document.getElementById('compare-setup-heading');
+            const subtext = document.getElementById('compare-setup-subtext');
+            const countLabel = document.getElementById('compare-setup-count-label');
+            const cardsList = document.getElementById('compare-setup-cards-list');
+            const emptyCard = document.getElementById('compare-setup-empty-card');
+            const ctaStatus = document.getElementById('compare-setup-cta-status');
+            const runBtn = document.getElementById('compare-setup-run-btn');
+
+            if (countLabel) {
+                countLabel.innerText = `Selected Manuscripts (${count} of 5)`;
+            }
+
+            if (count === 0) {
+                if (heading) heading.innerText = "Start a new comparison.";
+                if (subtext) subtext.innerText = "Select papers from your library or analyze a new manuscript. You need 2 to 5 papers to run a multi-document synthesis.";
+                if (emptyCard) emptyCard.classList.remove('hidden');
+                if (cardsList) cardsList.innerHTML = '';
+                if (ctaStatus) ctaStatus.innerText = "Select at least 2 papers to compare";
+                if (runBtn) {
+                    runBtn.disabled = true;
+                    runBtn.classList.add('opacity-40', 'pointer-events-none');
+                }
+            } else {
+                if (heading) heading.innerText = "Ready to compare.";
+                if (subtext) subtext.innerText = "Choose the papers you want PaperLens to synthesize. You can add or remove manuscripts before running the comparison.";
+                if (emptyCard) emptyCard.classList.add('hidden');
+
+                if (cardsList) {
+                    cardsList.innerHTML = '';
+                    let idx = 0;
+                    AppState.selectedForCompare.forEach(id => {
+                        const paper = AppState.papers.find(p => p.paper_id === id);
+                        const filename = paper ? paper.filename : 'Untitled Manuscript';
+                        const charCount = (paper && paper.full_text_length) ? paper.full_text_length.toLocaleString() : '0';
+                        const sections = (paper && paper.metadata && paper.metadata.detected_sections) ? paper.metadata.detected_sections : [];
+                        const hasRouge = paper && paper.rouge && paper.rouge.led && paper.rouge.led.rouge1;
+
+                        const card = document.createElement('div');
+                        card.className = "setup-card-animate p-4 rounded-xl border border-[#e5e5de] dark:border-[#242934] bg-white dark:bg-[#14171d] shadow-sm flex items-center justify-between gap-4 transition-all hover:border-[#1e3a8a]/40 group";
+                        card.style.animationDelay = `${idx * 40}ms`;
+
+                        let fidelityBadge = `<span class="text-[#787f91]">Un-evaluated</span>`;
+                        if (hasRouge) {
+                            fidelityBadge = `<span class="px-2 py-0.5 rounded bg-[#ecfdf5] dark:bg-[#064e3b]/40 text-[#065f46] dark:text-[#34d399] font-medium">R1: ${paper.rouge.led.rouge1.toFixed(3)}</span>`;
+                        }
+
+                        card.innerHTML = `
+                            <div class="flex items-center gap-3.5 min-w-0">
+                                <div class="w-9 h-9 rounded-lg bg-[#eff4fe] dark:bg-[#172554] text-[#1e3a8a] dark:text-[#3b82f6] flex items-center justify-center shrink-0">
+                                    <i data-lucide="file-text" class="w-4 h-4"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="font-serif font-semibold text-sm text-[#121316] dark:text-[#f1f3f7] truncate">${escapeHtml(filename)}</h4>
+                                    <div class="flex items-center gap-2 text-[11px] font-mono text-[#787f91] dark:text-[#646e82] mt-0.5">
+                                        <span>${charCount} chars</span>
+                                        <span>·</span>
+                                        <span>${sections.length} canonical sections</span>
+                                        <span>·</span>
+                                        ${fidelityBadge}
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" onclick="event.stopPropagation(); removePaperFromCompareSetup('${id}')" class="p-2 rounded-lg text-[#787f91] hover:text-[#991b1b] dark:hover:text-[#f87171] hover:bg-[#fef2f2] dark:hover:bg-[#7f1d1d]/20 transition-all shrink-0 cursor-pointer" title="Remove manuscript" aria-label="Remove manuscript">
+                                <i data-lucide="x" class="w-4 h-4"></i>
+                            </button>
+                        `;
+                        cardsList.appendChild(card);
+                        idx++;
+                    });
+                }
+
+                if (count === 1) {
+                    if (ctaStatus) ctaStatus.innerText = "Select at least 1 more paper (2 to 5 papers required)";
+                    if (runBtn) {
+                        runBtn.disabled = true;
+                        runBtn.classList.add('opacity-40', 'pointer-events-none');
+                    }
+                } else {
+                    if (ctaStatus) ctaStatus.innerText = `${count} manuscripts staged · Ready for comparative synthesis`;
+                    if (runBtn) {
+                        runBtn.disabled = false;
+                        runBtn.classList.remove('opacity-40', 'pointer-events-none');
+                    }
+                }
+            }
+
+            lucide.createIcons();
+        }
+
+        function removePaperFromCompareSetup(paperId) {
+            AppState.selectedForCompare.delete(paperId);
+            if (AppState.selectedForCompare.size < 2) {
+                AppState.hasCompared = false;
+            }
+            renderLibraryTable();
+            updateCompareSelectionBar();
+            renderCompareSetup();
+        }
+
+        async function executeComparisonSynthesis() {
+            const paperIds = Array.from(AppState.selectedForCompare);
             if (paperIds.length < 2 || paperIds.length > 5) {
-                emptyState.classList.remove('hidden');
-                activeView.classList.add('hidden');
+                showToast("Select 2 to 5 papers for comparison", "error");
                 return;
             }
 
-            emptyState.classList.add('hidden');
-            activeView.classList.remove('hidden');
-
-            renderCompareChips();
+            const btn = document.getElementById('compare-setup-run-btn');
+            const label = document.getElementById('compare-setup-run-label');
 
             try {
+                if (btn) btn.disabled = true;
+                if (label) label.innerText = "Synthesizing Synthesis...";
+
                 const res = await fetch('/api/compare', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -2840,11 +3980,42 @@
                 }
 
                 const report = await res.json();
-                renderComparisonReport(report);
+                AppState.hasCompared = true;
+                AppState.recentComparisonReport = report;
+
+                showCompareResults(report);
+                updateNavSubtitles();
+                showToast("Research synthesis completed successfully", "success");
 
             } catch (err) {
                 console.error("Comparison load error:", err);
                 showToast(err.message || "Failed to synthesize comparison", "error");
+            } finally {
+                if (btn) btn.disabled = false;
+                if (label) label.innerText = "Compare Papers →";
+                lucide.createIcons();
+            }
+        }
+
+        function showCompareResults(report = null) {
+            const setupView = document.getElementById('compare-setup-view');
+            const resultsView = document.getElementById('compare-results-view');
+            if (setupView) setupView.classList.add('hidden');
+            if (resultsView) resultsView.classList.remove('hidden');
+
+            renderCompareChips();
+
+            const r = report || AppState.recentComparisonReport;
+            if (r) {
+                renderComparisonReport(r);
+            }
+        }
+
+        async function loadComparison() {
+            if (AppState.hasCompared && AppState.recentComparisonReport && AppState.selectedForCompare.size >= 2) {
+                showCompareResults();
+            } else {
+                openCompareSetup();
             }
         }
 
@@ -2861,7 +4032,7 @@
                 chip.innerHTML = `
                     <span class="w-1.5 h-1.5 rounded-full bg-[#1e3a8a] dark:bg-[#3b82f6]"></span>
                     <span class="truncate max-w-[200px] text-[#121316] dark:text-[#f1f3f7] font-medium">${escapeHtml(title)}</span>
-                    <button onclick="removePaperFromCompare('${id}')" class="text-[#787f91] hover:text-[#991b1b] p-0.5 rounded-full transition-colors" title="Remove manuscript">
+                    <button type="button" onclick="event.stopPropagation(); removePaperFromCompare('${id}')" class="text-[#787f91] hover:text-[#991b1b] dark:hover:text-[#f87171] p-0.5 rounded-full transition-colors cursor-pointer" title="Remove manuscript" aria-label="Remove manuscript">
                         <i data-lucide="x" class="w-3 h-3"></i>
                     </button>
                 `;
@@ -2873,8 +4044,13 @@
         function removePaperFromCompare(paperId) {
             AppState.selectedForCompare.delete(paperId);
             renderLibraryTable();
-            updateCompareDock();
-            loadComparison();
+            updateCompareSelectionBar();
+            if (AppState.selectedForCompare.size < 2) {
+                AppState.hasCompared = false;
+                openCompareSetup();
+            } else {
+                executeComparisonSynthesis();
+            }
         }
 
         function renderComparisonReport(report) {

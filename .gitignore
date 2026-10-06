@@ -5,7 +5,7 @@
 # Python caches and bytecode
 __pycache__/
 *.py[cod]
-*.class
+*$py.class
 *.so
 .Python
 build/
@@ -18,7 +18,6 @@ lib/
 lib64/
 parts/
 sdist/
-var/
 wheels/
 share/python-wheels/
 *.egg-info/
@@ -26,7 +25,7 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# Testing and linting caches
+# Testing and coverage caches
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
@@ -46,25 +45,31 @@ ENV/
 env.bak/
 venv.bak/
 
-# Environment variables / secrets
+# Environment variables and secrets
 .env
 .env.*
+*.env
 *.secret
+*.key
 
 # Jupyter Notebooks
 .ipynb_checkpoints/
 *.ipynb
 
-# Local PDFs and data files (do NOT commit research papers or session data)
+# Local PDFs (do not commit research papers or generated PDFs)
 *.pdf
+
+# Runtime data directories (preserve directory structures via .gitkeep)
 data/raw/*
 !data/raw/.gitkeep
 data/processed/*
 !data/processed/.gitkeep
-data/samples/*
-!data/samples/.gitkeep
 data/sessions/*
 !data/sessions/.gitkeep
+
+# Sample data directory (preserve directory structure via .gitkeep; ignore large PDFs)
+data/samples/*.pdf
+!data/samples/.gitkeep
 
 # Hugging Face model cache and weights
 models/
@@ -78,12 +83,12 @@ checkpoints/
 *.ckpt
 *.onnx
 
-# Results and generated outputs
+# Evaluation outputs and generated benchmark results
 results/*
 !results/.gitkeep
 !results/README.md
 
-# Streamlit cache (legacy)
+# Legacy Streamlit cache
 .streamlit/
 
 # OS-generated files
@@ -101,13 +106,13 @@ desktop.ini
 # Logs and temporary files
 *.log
 *.tmp
+*.temp
 tmp/
 temp/
 
-# Agent skills and lockfiles
+# Development agent skills and lockfiles
 .agents/
 skills-lock.json
 
-# Scratch assets and reference mockups
-image.png
+# Design references and mockups
 reference/

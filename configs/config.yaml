@@ -1,7 +1,7 @@
-﻿# configs/config.yaml
+# configs/config.yaml
 # PaperLens pipeline configuration.
 # All values here are read by LEDSummarizer, the evaluation script,
-# and the Streamlit app.  Adjust to suit your hardware.
+# and the FastAPI application. Adjust to suit your hardware.
 
 # ---------------------------------------------------------------------------
 # Summarization model

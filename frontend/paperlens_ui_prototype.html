@@ -556,8 +556,8 @@
                     Turn research papers<br>into understanding.
                 </h1>
                 <!-- Supporting text -->
-                <p class="landing-subtext text-[#787f91] dark:text-[#646e82] text-base leading-relaxed max-w-lg mx-auto">
-                    Drop a paper here. PaperLens extracts the argument, method, findings,<br class="hidden sm:inline"> and limitations into a research brief.
+                <p class="landing-subtext text-[#787f91] dark:text-[#646e82] text-base leading-relaxed max-w-3xl mx-auto">
+                    Drop a paper here. PaperLens extracts the argument, method, findings, and limitations into a research brief.
                 </p>
             </div>
 
@@ -601,10 +601,6 @@
                                         or <span class="text-[#1e3a8a] dark:text-[#3b82f6] font-medium underline underline-offset-4 decoration-[#1e3a8a]/40 hover:decoration-[#1e3a8a] cursor-pointer">choose a PDF</span> from your computer
                                     </p>
                                 </div>
-
-                                <p class="text-xs text-[#787f91] dark:text-[#646e82] max-w-sm mx-auto leading-relaxed pt-1">
-                                    Published research PDFs and arXiv preprints
-                                </p>
 
                                 <div class="pt-2">
                                     <div class="inline-flex items-center gap-2 text-[11px] font-mono text-[#787f91] dark:text-[#949daf] border border-[#e5e5de] dark:border-[#242934] rounded-full px-3.5 py-1 bg-[#fbfbf9] dark:bg-[#101217]">
@@ -741,18 +737,13 @@
                     </button>
                 </div>
             </div>
-
-            <!-- Subtle hint -->
-            <p id="landing-hint-text" class="landing-hint mt-6 text-[11px] font-mono text-[#b0b3bb] dark:text-[#444e63] tracking-wide text-center">
-                Supports published research PDFs and arXiv preprints
-            </p>
         </div>
     </div>
 
     <!-- Top Navigation Header (56px) -->
     <header class="h-14 border-b border-[#e5e5de] dark:border-[#242934] bg-white dark:bg-[#14171d] px-6 flex items-center justify-between shrink-0 z-30 transition-colors">
         <!-- Brand -->
-        <div class="flex items-center gap-3 cursor-pointer" onclick="navigateTo('library')">
+        <div class="flex items-center gap-3 cursor-pointer" onclick="navGoLibrary()">
             <div class="w-7 h-7 rounded-md bg-[#1e3a8a] dark:bg-[#3b82f6] text-white flex items-center justify-center shadow-sm">
                 <i data-lucide="book-open" class="w-4 h-4"></i>
             </div>
@@ -764,7 +755,7 @@
 
         <!-- Primary Top-Level Navigation Tabs: Library / Analyze / Compare / Evaluation -->
         <nav class="flex items-center gap-1 bg-[#f3f3ee] dark:bg-[#1a1e26] p-1 rounded-md border border-[#e5e5de] dark:border-[#242934]" id="global-nav">
-            <button onclick="navigateTo('library')" data-nav="library" class="nav-tab px-3.5 py-1 rounded text-xs font-medium transition-all text-[#121316] dark:text-[#f1f3f7] bg-white dark:bg-[#20242e] shadow-sm">
+            <button onclick="navGoLibrary()" data-nav="library" class="nav-tab px-3.5 py-1 rounded text-xs font-medium transition-all text-[#121316] dark:text-[#f1f3f7] bg-white dark:bg-[#20242e] shadow-sm">
                 Library <span id="nav-count-badge" class="font-mono text-[11px] ml-1 text-[#787f91] dark:text-[#646e82]">(0)</span>
             </button>
 
@@ -1766,7 +1757,7 @@
     </main>
 
     <!-- Floating Multi-Paper Synthesis Selection Bar (Anchored to true viewport) -->
-    <div id="compare-selection-bar">
+    <div id="compare-selection-bar" class="hidden">
         <div class="pointer-events-auto bg-white/95 dark:bg-[#14171d]/95 backdrop-blur-md text-[#121316] dark:text-[#f1f3f7] border border-[#e5e5de] dark:border-[#242934] rounded-2xl p-3.5 shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div class="flex-1 min-w-0 space-y-1.5">
                 <div class="flex items-center gap-2">
@@ -2206,6 +2197,13 @@
         // -------------------------------------------------------------
         // Global Workspace Action Handlers (Analyze & Compare)
         // -------------------------------------------------------------
+        function navGoLibrary() {
+            setNavMenu(null, true);
+            AppState.isLibrarySelectionMode = false;
+            navigateTo('library');
+            updateCompareSelectionBar();
+        }
+
         function navGoRecentAnalysis() {
             setNavMenu(null, true);
             if (AppState.currentPaperId) {
@@ -2298,8 +2296,8 @@
             }
 
 
-            // Reset library selection mode if navigating elsewhere
-            if (screenId !== 'library' && screenId !== 'compare') {
+            // Reset library selection mode if navigating to any screen other than library
+            if (screenId !== 'library') {
                 AppState.isLibrarySelectionMode = false;
             }
 
@@ -2339,6 +2337,7 @@
                 }
             }
 
+            updateCompareSelectionBar();
             lucide.createIcons();
         }
 
@@ -2675,6 +2674,7 @@
                 // Seamless transition to result view AFTER processing is complete
                 if (wasMulti && processedPapers.length > 1) {
                     AppState.selectedForCompare = new Set(processedPapers.map(p => p.paper_id));
+                    syncAndDeduplicateCompareSelection();
                     AppState.hasCompared = false;
                     navigateTo('compare');
                     openCompareSetup();
@@ -2935,6 +2935,43 @@
             });
         }
 
+        // -------------------------------------------------------------
+        // Canonical Manuscript Identity Helper
+        // -------------------------------------------------------------
+        function getManuscriptIdentity(paperOrId) {
+            if (!paperOrId) return '';
+            let paper = null;
+            let rawId = '';
+            if (typeof paperOrId === 'object' && paperOrId !== null) {
+                paper = paperOrId;
+                rawId = paper.paper_id || paper.id || paper.manuscript_id || '';
+            } else {
+                rawId = String(paperOrId).trim();
+                paper = (AppState.papers || []).find(p => p.paper_id === rawId);
+            }
+
+            // 1. Existing canonical manuscript/content ID or fingerprint if one already exists
+            if (paper) {
+                if (paper.canonical_id) return `cid:${String(paper.canonical_id).trim()}`;
+                if (paper.fingerprint) return `fp:${String(paper.fingerprint).trim()}`;
+                if (paper.content_id) return `cnt:${String(paper.content_id).trim()}`;
+                if (paper.manuscript_id) return `mid:${String(paper.manuscript_id).trim()}`;
+            }
+
+            // 2. Deterministic normalized file/content identity fallback
+            // Combines normalized filename with text length to preserve unique identity
+            if (paper && paper.filename) {
+                const normName = String(paper.filename).trim().toLowerCase();
+                const lengthSig = (paper.full_text_length !== undefined && paper.full_text_length !== null)
+                    ? String(paper.full_text_length).trim()
+                    : '';
+                return `ms:${normName}:${lengthSig}`;
+            }
+
+            // 3. Fallback: Stable paper_id
+            return rawId ? `pid:${rawId}` : '';
+        }
+
         function renderLibraryTable() {
             const tbody = document.getElementById('library-table-body');
             const emptyState = document.getElementById('library-empty-state');
@@ -2956,7 +2993,10 @@
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-[#fbfbf9] dark:hover:bg-[#111317]/50 transition-colors";
 
-                const isChecked = AppState.selectedForCompare.has(paper.paper_id);
+                const paperIdentity = getManuscriptIdentity(paper);
+                const isChecked = Array.from(AppState.selectedForCompare).some(selectedId => {
+                    return selectedId === paper.paper_id || (paperIdentity && getManuscriptIdentity(selectedId) === paperIdentity);
+                });
                 const hasRouge = paper.rouge && (paper.rouge.led || paper.rouge.tfidf);
 
                 // Section badges
@@ -3013,25 +3053,111 @@
         // -------------------------------------------------------------
         // Comparison Selection Bar & Actions
         // -------------------------------------------------------------
+        function syncAndDeduplicateCompareSelection() {
+            if (!AppState.selectedForCompare) {
+                AppState.selectedForCompare = new Set();
+                return;
+            }
+            let rawItems = [];
+            if (AppState.selectedForCompare instanceof Set) {
+                rawItems = Array.from(AppState.selectedForCompare);
+            } else if (Array.isArray(AppState.selectedForCompare)) {
+                rawItems = AppState.selectedForCompare;
+            } else if (typeof AppState.selectedForCompare === 'object') {
+                rawItems = Object.values(AppState.selectedForCompare);
+            }
+
+            const seenIdentities = new Set();
+            const seenIds = new Set();
+            const canonicalIds = [];
+
+            for (const item of rawItems) {
+                const id = (typeof item === 'object' && item !== null)
+                    ? (item.paper_id || item.id || item.manuscript_id)
+                    : (item !== null && item !== undefined ? String(item).trim() : '');
+                if (!id || seenIds.has(id)) continue;
+
+                const identity = getManuscriptIdentity(item) || getManuscriptIdentity(id);
+                if (identity) {
+                    if (seenIdentities.has(identity)) continue;
+                    seenIdentities.add(identity);
+                }
+
+                seenIds.add(id);
+                canonicalIds.push(id);
+                if (canonicalIds.length >= 5) break;
+            }
+
+            AppState.selectedForCompare = new Set(canonicalIds);
+        }
+
         function toggleCompareSelect(paperId, checked) {
+            if (!paperId) return;
+            const id = (typeof paperId === 'object' && paperId !== null)
+                ? (paperId.paper_id || paperId.id || paperId.manuscript_id)
+                : (paperId !== null && paperId !== undefined ? String(paperId).trim() : '');
+            if (!id) return;
+
+            syncAndDeduplicateCompareSelection();
+
+            const targetIdentity = getManuscriptIdentity(paperId) || getManuscriptIdentity(id);
+
             if (checked) {
+                AppState.isLibrarySelectionMode = true;
+
+                // Check if a paper with this manuscript identity is already selected
+                const isAlreadySelected = Array.from(AppState.selectedForCompare).some(existingId => {
+                    if (existingId === id) return true;
+                    if (targetIdentity) {
+                        return getManuscriptIdentity(existingId) === targetIdentity;
+                    }
+                    return false;
+                });
+
+                if (isAlreadySelected) {
+                    renderLibraryTable();
+                    updateCompareSelectionBar();
+                    renderCompareSetup();
+                    updateAnalysisCompareBtnState();
+                    return;
+                }
+
                 if (AppState.selectedForCompare.size >= 5) {
                     showToast("Maximum 5 papers allowed for comparison", "error");
                     renderLibraryTable();
                     return;
                 }
-                AppState.selectedForCompare.add(paperId);
+
+                AppState.selectedForCompare.add(id);
             } else {
-                AppState.selectedForCompare.delete(paperId);
+                // Delete all IDs that match this paper ID or this manuscript identity
+                const toDelete = [];
+                AppState.selectedForCompare.forEach(existingId => {
+                    if (existingId === id) {
+                        toDelete.push(existingId);
+                    } else if (targetIdentity && getManuscriptIdentity(existingId) === targetIdentity) {
+                        toDelete.push(existingId);
+                    }
+                });
+                toDelete.forEach(delId => AppState.selectedForCompare.delete(delId));
+
                 if (AppState.selectedForCompare.size < 2) {
                     AppState.hasCompared = false;
                 }
+                if (AppState.selectedForCompare.size === 0) {
+                    AppState.isLibrarySelectionMode = false;
+                }
             }
+
+            syncAndDeduplicateCompareSelection();
             renderLibraryTable();
+            updateCompareSelectionBar();
+            renderCompareSetup();
             updateAnalysisCompareBtnState();
         }
 
         function updateCompareSelectionBar() {
+            syncAndDeduplicateCompareSelection();
             const count = AppState.selectedForCompare.size;
             const bar = document.getElementById('compare-selection-bar');
             const label = document.getElementById('selection-bar-label');
@@ -3053,14 +3179,20 @@
 
             if (!bar) return;
 
-            // Only display the floating selection bar while on the library screen and papers are selected
-            const shouldShow = (AppState.currentScreen === 'library') && (count > 0);
+            // The bottom comparison-selection dock belongs ONLY to:
+            // - Library Comparison Selection Mode
+            // It must NEVER appear on: Compare Results, Research Brief, Deep Dive, Evaluation, Landing, normal Library
+            const shouldShow = (AppState.currentScreen === 'library') && (AppState.isLibrarySelectionMode === true) && (count > 0);
             if (!shouldShow) {
                 bar.classList.remove('is-visible');
+                bar.classList.add('hidden');
+                bar.setAttribute('aria-hidden', 'true');
                 return;
             }
 
+            bar.classList.remove('hidden');
             bar.classList.add('is-visible');
+            bar.removeAttribute('aria-hidden');
 
             if (label) {
                 label.innerText = `SELECTED FOR COMPARISON · ${count} ${count === 1 ? 'MANUSCRIPT' : 'MANUSCRIPTS'}`;
@@ -3068,7 +3200,21 @@
 
             if (chips) {
                 chips.innerHTML = '';
-                AppState.selectedForCompare.forEach(id => {
+                const seenChipIdentities = new Set();
+                AppState.selectedForCompare.forEach(rawId => {
+                    const id = (typeof rawId === 'object' && rawId !== null)
+                        ? (rawId.paper_id || rawId.id || rawId.manuscript_id)
+                        : (rawId !== null && rawId !== undefined ? String(rawId).trim() : '');
+                    if (!id) return;
+                    const identity = getManuscriptIdentity(rawId) || getManuscriptIdentity(id);
+                    if (identity) {
+                        if (seenChipIdentities.has(identity)) return;
+                        seenChipIdentities.add(identity);
+                    } else {
+                        if (seenChipIdentities.has(id)) return;
+                        seenChipIdentities.add(id);
+                    }
+
                     const paper = AppState.papers.find(p => p.paper_id === id);
                     const title = paper ? paper.filename : id;
                     const chip = document.createElement('div');
@@ -3114,29 +3260,39 @@
 
         function clearComparisonSelection() {
             AppState.selectedForCompare.clear();
+            AppState.isLibrarySelectionMode = false;
+            syncAndDeduplicateCompareSelection();
             AppState.hasCompared = false;
             AppState.recentComparisonReport = null;
             renderLibraryTable();
+            updateCompareSelectionBar();
+            renderCompareSetup();
             updateAnalysisCompareBtnState();
         }
 
         function continueToCompareSetup() {
+            syncAndDeduplicateCompareSelection();
             if (AppState.selectedForCompare.size < 2) {
                 showToast("Select at least 2 papers to synthesize", "error");
                 return;
             }
+            AppState.isLibrarySelectionMode = false;
+            updateCompareSelectionBar();
             navigateTo('compare');
             openCompareSetup();
         }
 
         function compareSetupAddFromLibrary() {
+            syncAndDeduplicateCompareSelection();
             AppState.isLibrarySelectionMode = true;
             navigateTo('library');
             updateCompareSelectionBar();
         }
 
         function exitLibraryCompareMode() {
+            syncAndDeduplicateCompareSelection();
             AppState.isLibrarySelectionMode = false;
+            updateCompareSelectionBar();
             navigateTo('compare');
             openCompareSetup();
         }
@@ -3368,6 +3524,7 @@
 
                     // Add new manuscript to selectedForCompare, PRESERVING all previous selections!
                     AppState.selectedForCompare.add(newPaper.paper_id);
+                    syncAndDeduplicateCompareSelection();
                     AppState.hasCompared = false;
 
                     // Refresh library in background
@@ -3846,14 +4003,17 @@
         // Cross-Paper Comparison: Setup & Research Synthesis
         // -------------------------------------------------------------
         function openCompareSetup() {
+            syncAndDeduplicateCompareSelection();
             const setupView = document.getElementById('compare-setup-view');
             const resultsView = document.getElementById('compare-results-view');
             if (setupView) setupView.classList.remove('hidden');
             if (resultsView) resultsView.classList.add('hidden');
             renderCompareSetup();
+            updateCompareSelectionBar();
         }
 
         function renderCompareSetup() {
+            syncAndDeduplicateCompareSelection();
             const count = AppState.selectedForCompare.size;
             const heading = document.getElementById('compare-setup-heading');
             const subtext = document.getElementById('compare-setup-subtext');
@@ -3885,7 +4045,16 @@
                 if (cardsList) {
                     cardsList.innerHTML = '';
                     let idx = 0;
-                    AppState.selectedForCompare.forEach(id => {
+                    const seenCardIdentities = new Set();
+                    AppState.selectedForCompare.forEach(rawId => {
+                        const id = (typeof rawId === 'object' && rawId !== null)
+                            ? (rawId.paper_id || rawId.id || rawId.manuscript_id)
+                            : (rawId !== null && rawId !== undefined ? String(rawId).trim() : '');
+                        if (!id) return;
+                        const identity = getManuscriptIdentity(rawId) || getManuscriptIdentity(id) || id;
+                        if (seenCardIdentities.has(identity)) return;
+                        seenCardIdentities.add(identity);
+
                         const paper = AppState.papers.find(p => p.paper_id === id);
                         const filename = paper ? paper.filename : 'Untitled Manuscript';
                         const charCount = (paper && paper.full_text_length) ? paper.full_text_length.toLocaleString() : '0';
@@ -3917,10 +4086,17 @@
                                     </div>
                                 </div>
                             </div>
-                            <button type="button" onclick="event.stopPropagation(); removePaperFromCompareSetup('${id}')" class="p-2 rounded-lg text-[#787f91] hover:text-[#991b1b] dark:hover:text-[#f87171] hover:bg-[#fef2f2] dark:hover:bg-[#7f1d1d]/20 transition-all shrink-0 cursor-pointer" title="Remove manuscript" aria-label="Remove manuscript">
+                            <button type="button" class="setup-card-remove-btn p-2 rounded-lg text-[#787f91] hover:text-[#991b1b] dark:hover:text-[#f87171] hover:bg-[#fef2f2] dark:hover:bg-[#7f1d1d]/20 transition-all shrink-0 cursor-pointer" title="Remove manuscript" aria-label="Remove manuscript">
                                 <i data-lucide="x" class="w-4 h-4"></i>
                             </button>
                         `;
+                        const rmBtn = card.querySelector('.setup-card-remove-btn');
+                        if (rmBtn) {
+                            rmBtn.onclick = (e) => {
+                                e.stopPropagation();
+                                removePaperFromCompareSetup(id);
+                            };
+                        }
                         cardsList.appendChild(card);
                         idx++;
                     });
@@ -3945,21 +4121,41 @@
         }
 
         function removePaperFromCompareSetup(paperId) {
-            AppState.selectedForCompare.delete(paperId);
+            const id = (typeof paperId === 'object' && paperId !== null)
+                ? (paperId.paper_id || paperId.id || paperId.manuscript_id)
+                : (paperId !== null && paperId !== undefined ? String(paperId).trim() : '');
+            const targetIdentity = getManuscriptIdentity(paperId) || (id ? getManuscriptIdentity(id) : null);
+
+            const toDelete = [];
+            AppState.selectedForCompare.forEach(existingId => {
+                if (existingId === id) {
+                    toDelete.push(existingId);
+                } else if (targetIdentity && getManuscriptIdentity(existingId) === targetIdentity) {
+                    toDelete.push(existingId);
+                }
+            });
+            toDelete.forEach(delId => AppState.selectedForCompare.delete(delId));
+
+            syncAndDeduplicateCompareSelection();
             if (AppState.selectedForCompare.size < 2) {
                 AppState.hasCompared = false;
             }
             renderLibraryTable();
             updateCompareSelectionBar();
             renderCompareSetup();
+            updateAnalysisCompareBtnState();
         }
 
         async function executeComparisonSynthesis() {
+            syncAndDeduplicateCompareSelection();
             const paperIds = Array.from(AppState.selectedForCompare);
             if (paperIds.length < 2 || paperIds.length > 5) {
                 showToast("Select 2 to 5 papers for comparison", "error");
                 return;
             }
+
+            AppState.isLibrarySelectionMode = false;
+            updateCompareSelectionBar();
 
             const btn = document.getElementById('compare-setup-run-btn');
             const label = document.getElementById('compare-setup-run-label');
@@ -3998,6 +4194,7 @@
         }
 
         function showCompareResults(report = null) {
+            AppState.isLibrarySelectionMode = false;
             const setupView = document.getElementById('compare-setup-view');
             const resultsView = document.getElementById('compare-results-view');
             if (setupView) setupView.classList.add('hidden');
@@ -4009,6 +4206,7 @@
             if (r) {
                 renderComparisonReport(r);
             }
+            updateCompareSelectionBar();
         }
 
         async function loadComparison() {
@@ -4020,11 +4218,21 @@
         }
 
         function renderCompareChips() {
+            syncAndDeduplicateCompareSelection();
             const container = document.getElementById('compare-selected-chips');
             if (!container) return;
             container.innerHTML = '';
 
-            AppState.selectedForCompare.forEach(id => {
+            const seenChipIdentities = new Set();
+            AppState.selectedForCompare.forEach(rawId => {
+                const id = (typeof rawId === 'object' && rawId !== null)
+                    ? (rawId.paper_id || rawId.id || rawId.manuscript_id)
+                    : (rawId !== null && rawId !== undefined ? String(rawId).trim() : '');
+                if (!id) return;
+                const identity = getManuscriptIdentity(rawId) || getManuscriptIdentity(id) || id;
+                if (seenChipIdentities.has(identity)) return;
+                seenChipIdentities.add(identity);
+
                 const paper = AppState.papers.find(p => p.paper_id === id);
                 const title = paper ? paper.filename : id;
                 const chip = document.createElement('div');
@@ -4032,19 +4240,43 @@
                 chip.innerHTML = `
                     <span class="w-1.5 h-1.5 rounded-full bg-[#1e3a8a] dark:bg-[#3b82f6]"></span>
                     <span class="truncate max-w-[200px] text-[#121316] dark:text-[#f1f3f7] font-medium">${escapeHtml(title)}</span>
-                    <button type="button" onclick="event.stopPropagation(); removePaperFromCompare('${id}')" class="text-[#787f91] hover:text-[#991b1b] dark:hover:text-[#f87171] p-0.5 rounded-full transition-colors cursor-pointer" title="Remove manuscript" aria-label="Remove manuscript">
+                    <button type="button" class="compare-chip-remove-btn text-[#787f91] hover:text-[#991b1b] dark:hover:text-[#f87171] p-0.5 rounded-full transition-colors cursor-pointer" title="Remove manuscript" aria-label="Remove manuscript">
                         <i data-lucide="x" class="w-3 h-3"></i>
                     </button>
                 `;
+                const rmBtn = chip.querySelector('.compare-chip-remove-btn');
+                if (rmBtn) {
+                    rmBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        removePaperFromCompare(id);
+                    };
+                }
                 container.appendChild(chip);
             });
             lucide.createIcons();
         }
 
         function removePaperFromCompare(paperId) {
-            AppState.selectedForCompare.delete(paperId);
+            const id = (typeof paperId === 'object' && paperId !== null)
+                ? (paperId.paper_id || paperId.id || paperId.manuscript_id)
+                : (paperId !== null && paperId !== undefined ? String(paperId).trim() : '');
+            const targetIdentity = getManuscriptIdentity(paperId) || (id ? getManuscriptIdentity(id) : null);
+
+            const toDelete = [];
+            AppState.selectedForCompare.forEach(existingId => {
+                if (existingId === id) {
+                    toDelete.push(existingId);
+                } else if (targetIdentity && getManuscriptIdentity(existingId) === targetIdentity) {
+                    toDelete.push(existingId);
+                }
+            });
+            toDelete.forEach(delId => AppState.selectedForCompare.delete(delId));
+
+            syncAndDeduplicateCompareSelection();
             renderLibraryTable();
             updateCompareSelectionBar();
+            renderCompareSetup();
+            updateAnalysisCompareBtnState();
             if (AppState.selectedForCompare.size < 2) {
                 AppState.hasCompared = false;
                 openCompareSetup();
